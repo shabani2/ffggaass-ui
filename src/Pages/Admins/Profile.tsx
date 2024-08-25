@@ -26,13 +26,14 @@ const Profile = () => {
 
   return (
     <>
+    <div className='p-[2rem] w-full bg-gray-200 h-screen'>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
           <Typography variant="h4">Profile</Typography>
          
         </Stack> 
       </Stack>
-      <Stack spacing={3}>
+      <Stack spacing={3} >
       
       <Grid container spacing={3} gap={4} margin={3}>
         <Grid lg={3} md={6} xs={12}>
@@ -62,11 +63,13 @@ const Profile = () => {
          </Card>
         </Grid>
 
-        <Grid lg={8} md={6} xs={12} className='bg-gray-200 rounded h-40b-lg'>
+        <Grid lg={8} md={6} xs={12} className='bg-gray-100 rounded shadow-lg h-40b-lg' >
           <UserForm user={user}/>
         </Grid>
       </Grid>
     </Stack>
+    </div>
+      
     </>
   )
 }

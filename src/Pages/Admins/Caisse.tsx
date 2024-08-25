@@ -1,259 +1,495 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, Grid } from '@mui/material';
+import { Box, TextField, Select, MenuItem, FormControl, InputLabel, Grid, CircularProgress, Modal, Typography, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import { fetchProduits, Produit1, selectAllProduits } from '@/Redux/Admin/productSlice';
 import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice';
-import { fetchPointVentes, selectAllPointVentes } from '@/Redux/Admin/pointVenteSlice';
-import { addMvtStock } from '@/Redux/Admin/mvtStockSlice';
+import { selectCurrentUser } from '@/Redux/Auth/userSlice';
+import { Vente } from '@/Utils/dataTypes';
+import { addVente } from '@/Redux/Admin/venteSlice';
+import {jsPDF} from 'jspdf';  // Import jsPDF
+import 'jspdf-autotable';
+//import { DownloadIcon } from 'lucide-react';
+import {Download as DownloadIcon} from '@mui/icons-material';
+
 
 
 const validationSchema = yup.object({
-  operation: yup.string().required('Operation is required'),
   quantite: yup.number().required('Quantite is required').min(1, 'Quantite must be at least 1'),
   montant: yup.number().required('Montant is required').min(1, 'Montant must be at least 1'),
-  statut: yup.string().required('Statut is required'),
   produit: yup.string().required('Produit is required'),
-  pointVente: yup.string().required('PointVente is required'),
   category: yup.string().required('Category is required'),
 });
 
-const Caisse: React.FC = () => {
-  const dispatch:AppDispatch = useDispatch<AppDispatch>();
+const validationClientSchema = yup.object({ 
+  name: yup.string().required('name is required'),
+  numero: yup.string().required('numero is required'),
+  adresse:yup.string().required('adresse is required'),
+});
+
+const CaisseVendeur: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
   const produits = useSelector((state: RootState) => selectAllProduits(state));
   const categories = useSelector((state: RootState) => selectAllCategories(state));
-  const pointVentes = useSelector((state: RootState) => selectAllPointVentes(state));
 
   const [filteredProduits, setFilteredProduits] = useState<Produit1[]>([]);
-  const [selectedProduit, setSelectedProduit]= useState<Produit1|null>(null);
+  const [selectedProduit, setSelectedProduit] = useState<Produit1 | null>(null);
+  const [client,setClient] = useState({nom:'',numero:'',adresse:''})
+  const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+ 
+  const user = useSelector(selectCurrentUser);
+
+  const [products, setProducts] = useState<Vente[]>([]);
+
+ 
 
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchProduits());
-    dispatch(fetchPointVentes());
   }, [dispatch]);
 
   const formik = useFormik({
     initialValues: {
-      operation: 'vente',
       quantite: 0,
       montant: 0,
-      statut: 'unvalidate',
       produit: '',
-      pointVente: '',
       category: '',
       prix: 0,
-      prixVente:0
     },
     validationSchema: validationSchema,
     onSubmit: (values,{resetForm}) => {
-      
-      const newMvtStock = { ...values, produit: selectedProduit, pointVente: pointVentes.find((pv) => pv.id === values.pointVente) };
-      const data = {
-         operation: newMvtStock.operation,
-         quantite:newMvtStock.quantite,
-         montant:newMvtStock.montant ,
-         statut:newMvtStock?.statut,
-          produitId:newMvtStock.produit?.id,
-          pointVenteId:newMvtStock.pointVente?._id
-         }
-         console.log('mvtStock==> : ',data)
-      dispatch(addMvtStock(data));
-      resetForm()
+      const newMvtStock = { ...values, produit: selectedProduit };
+      const data = {        
+        quantite:newMvtStock.quantite,
+        montant:newMvtStock.montant ,
+        produit:newMvtStock?.produit,
+        pointVente:user?.pointVente
+        }
+     //@ts-ignore
+      setProducts([...products,data])
+      console.log('pruits selected==> : ', products);
+      //dispatch(addVente(data));
+      resetForm();
     },
   });
 
-  const handleCategoryChange = (event: { target: { value: any; }; }) => {
+  const handleCategoryChange = (event: { target: { value: any } }) => {
     const categoryId = event.target.value as string;
     formik.setFieldValue('category', categoryId);
-    setFilteredProduits(produits.filter((produit :Produit1) => produit.category._id === categoryId));
+    setFilteredProduits(produits.filter((produit: Produit1) => produit.category._id === categoryId));
     formik.setFieldValue('produit', '');
     formik.setFieldValue('prix', 0);
-    formik.setFieldValue('prixVente', 0);
   };
 
-  const handleProduitChange = (event: { target: { value: any; }; }) => {
+  const handleProduitChange = (event: { target: { value: any } }) => {
     const produitId = event.target.value as string;
     const selected = produits.find((produit) => produit?._id === produitId);
     setSelectedProduit(selected || null);
     formik.setFieldValue('produit', produitId);
-    formik.setFieldValue('prix', selected?.prix);
-    formik.setFieldValue('prixVente', selected?.prixVente);
+    formik.setFieldValue('prix', selected?.prixVente);
   };
 
   useEffect(() => {
-    
-    const montant = formik.values.operation==='vente' ? formik.values.quantite * formik.values.prixVente :formik.values.quantite * formik.values.prix
+    const montant = formik.values.quantite * formik.values.prix;
     formik.setFieldValue('montant', montant);
-  }, [formik.values.quantite, formik.values.prix]);
+  }, [formik.values.quantite, formik.values.prix]);  
+
+  const totalAmount = products.reduce((acc, product) => acc + product.montant, 0);
+
+  const clientFormik = useFormik({
+    initialValues: {nom: '', numero: '', adresse: ''},
+    validationSchema: validationClientSchema,
+    onSubmit: (values, { resetForm }) => {
+      console.log('Form Submitted', client);
+      products.forEach((p) => dispatch(addVente(p)));
+      setClient(values);
+      resetForm();
+      setProducts([]);
+    },
+  });
+  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+    const { name, value } = e.target;
+    setClient({
+      ...client,
+      [name]: value,
+    });
+  };
+  const validateFacture = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    setLoading(true); // Commencez le chargement
+
+    try {
+      console.log('Form Submitted', client);
+      for (const p of products) {
+        await dispatch(addVente(p)); // Ajoutez des ventes une par une
+      }
+      
+     
+      setProducts([]);
+      setModalOpen(true)
+    } finally {
+      setLoading(false); // Terminez le chargement
+    }
+  };
+
+  const generateInvoicePDF = () => {
+    const doc = new jsPDF();
+
+    doc.text("Facture", 20, 20);
+    doc.text(`Client: ${client.nom}`, 20, 30);
+    doc.text(`Numéro: ${client.numero}`, 20, 40);
+    doc.text(`Adresse: ${client.adresse}`, 20, 50);
+
+   // Ajouter un en-tête pour les produits
+  let y = 60; // Position de départ pour les lignes de produits
+  doc.text("Produit", 20, y);
+  doc.text("Quantité", 80, y);
+  doc.text("Prix Unitaire", 140, y);
+  doc.text("Montant", 200, y);
+
+  // Ajouter les lignes de produits
+  y += 10; // Déplacement vers le bas après l'en-tête
+  products.forEach((product) => {
+    doc.text(product?.produit.nom, 20, y);
+    doc.text(product.quantite.toString(), 80, y);
+    doc.text(product?.produit.prixVente.toFixed(2), 140, y);
+    doc.text(product.montant.toFixed(2), 200, y);
+    y += 10; // Déplacement vers le bas pour la prochaine ligne
+  });
+
+  // Ajouter le total
+  doc.text(`Total: fc ${totalAmount.toFixed(2)}`, 20, y + 10);
+
+
+    doc.save(`facture_${client.nom}.pdf`);
+    setClient({ nom: '', numero: '', adresse: '' });
+    setModalOpen(false);
+  };
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setClient({ nom: '', numero: '', adresse: '' });
+  };
 
   return (
-    <div className='flex justify-center'>
-      <Box component="form" onSubmit={formik.handleSubmit} sx={{ flexGrow: 1,width:'80%', boxShadow: 3, borderRadius: '8px', overflow: 'hidden', padding: 3, height: 500, margin:3 }} >
-    <div className='text-xl text-blue-500'>Operation de livraison ou de vente</div>
-    <Grid container spacing={2}>
-      <Grid item xs={4}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Operation</InputLabel>
-          <Select
-            name="operation"
-            value={formik.values.operation}
-            onChange={formik.handleChange}
-            error={formik.touched.operation && Boolean(formik.errors.operation)}
+    <>
+    <Modal
+          open={modalOpen}
+          onClose={handleModalClose}
+          aria-labelledby="modal-title"
+          aria-describedby="modal-description"
+          
+        >
+          <Box        
+           
+            sx={{
+              maxWidth:"90%",
+              display:"flex",
+              flexDirection:"column",
+              justifyContent:"center",
+              alignItems:"center",
+              bgcolor:"background.paper",
+              p:4,
+              position:"fixed",
+              borderRadius:4,
+              boxShadow:3,
+              width:"400px",
+              top:"50%",
+              left:"50%",
+              transform:"translate(-50%, -50%)"
+            }}
           >
-            <MenuItem value="vente">Vente</MenuItem>
-            <MenuItem value="livraison">Livraison</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
+            <Typography variant="h6" id="modal-title" gutterBottom>
+              imprimer la facture
+            </Typography>
 
-      <Grid item xs={4}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>PointVente</InputLabel>
-          <Select
-            name="pointVente"
-            value={formik.values.pointVente}
-            onChange={formik.handleChange}
-            error={formik.touched.pointVente && Boolean(formik.errors.pointVente)}
-          >
-            {pointVentes.map((pointVente) => (
-              <MenuItem key={pointVente.id} value={pointVente.id}>
-                {pointVente.nom}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              flexGrow={1}
+              mt={2}
+            >
+              <IconButton
+                color="primary"
+                style={{ fontSize: '3rem' }} // Grande taille pour l'icône
+                onClick={generateInvoicePDF}
+              >
+                <DownloadIcon />
+              </IconButton>
+            </Box>
 
-      <Grid item xs={4}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Category</InputLabel>
-          <Select
-            name="category"
-            value={formik.values.category}
-            onChange={handleCategoryChange}
-            error={formik.touched.category && Boolean(formik.errors.category)}
-          >
-            {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id}>
-                {category.nom}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
+            <Box
+              display="flex"
+              justifyContent="flex-end"
+              gap={1}
+              mt={2}
+            >
+              <button
+                onClick={generateInvoicePDF}
+                 className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
+              >
+                confirmer
+              </button>
 
-      <Grid item xs={4}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Produit</InputLabel>
-          <Select
-            name="produit"
-            value={formik.values.produit}
-            onChange={handleProduitChange}
-            error={formik.touched.produit && Boolean(formik.errors.produit)}
-          >
-            {filteredProduits.map((produit) => (
-              <MenuItem key={produit.id} value={produit.id}>
-                {produit.nom}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-
-      <Grid item xs={4}>
-        <TextField
-          fullWidth
-          margin="normal"
-          id="prix"
-          name="prix"
-          label="Prix"
-          type="number"
-          value={formik.values.prix}
-          onChange={formik.handleChange}
-          error={formik.touched.prix && Boolean(formik.errors.prix)}
-          helperText={formik.touched.prix && formik.errors.prix}
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <TextField
-          fullWidth
-          margin="normal"
-          id="prixVente"
-          name="prixVente"
-          label="PrixVente"
-          type="number"
-          value={formik.values.prixVente}
-          onChange={formik.handleChange}           
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-      </Grid>
-
-      <Grid item xs={4}>
-        <TextField
-          fullWidth
-          margin="normal"
-          id="quantite"
-          name="quantite"
-          label="Quantite"
-          type="number"
-          value={formik.values.quantite}
-          onChange={formik.handleChange}
-          error={formik.touched.quantite && Boolean(formik.errors.quantite)}
-          helperText={formik.touched.quantite && formik.errors.quantite}
-        />
-      </Grid>
-
-      <Grid item xs={4}>
-        <TextField
-          fullWidth
-          margin="normal"
-          id="montant"
-          name="montant"
-          label="Montant"
-          type="number"
-          value={formik.values.montant}
-          onChange={formik.handleChange}
-          error={formik.touched.montant && Boolean(formik.errors.montant)}
-          helperText={formik.touched.montant && formik.errors.montant}
-        />
-      </Grid>
-
-      <Grid item xs={4}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Statut</InputLabel>
-          <Select
-            name="statut"
-            value={formik.values.statut}
-            onChange={formik.handleChange}
-            error={formik.touched.statut && Boolean(formik.errors.statut)}
-          >
-            <MenuItem value="validate">Validate</MenuItem>
-            <MenuItem value="unvalidate">Unvalidate</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>      
-
+              <button
+                onClick={handleModalClose}
+                 className="px-4 py-2 text-white bg-red-600 rounded-lg shadow-md hover:bg-red-500"
+              >
+                annuler
+              </button>
+            </Box>
+          </Box>
+    </Modal>
+    <div className='p-[2rem] w-full bg-gray-300'>
+    
       
-    </Grid>
+    <div className="flex flex-col items-center w-full min-h-screen p-6 ">
+      {/* Header */}
+      <header className="w-full p-6 mb-6 bg-white rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold text-gray-800">Gestion de  Caisse</h1>
+      </header>
 
-    <Box sx={{ mt: 3 }}>
-      <Button color="primary" variant="contained" type="submit">
-        Submit
-      </Button>
-    </Box>
-  </Box>
+      {/* Main Content */}
+      <main className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Product Selection Area */}
+        <section className="p-6 bg-white rounded-lg shadow-lg md:col-span-2">
+        
+
+          {/* Product Input */}
+          <div className="space-y-4 ">           
+             
+              <Box component="form" onSubmit={formik.handleSubmit} sx={{ flexGrow: 1 }}>
+                <Grid container spacing={2}>
+                    <Grid item xs={9}>
+                    <h2 className="mb-4 text-2xl font-semibold text-gray-700">Sélection des Produits</h2>
+                    </Grid>
+                    <Grid item xs={3}>
+                    <Box >
+                      <button  className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500" type='submit'>
+                        Ajouter le produit
+                      </button>
+                    </Box>
+                    </Grid>
+                </Grid>
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                      name="category"
+                      value={formik.values.category}
+                      onChange={handleCategoryChange}
+                      error={formik.touched.category && Boolean(formik.errors.category)}
+                    >
+                      {categories.map((category) => (
+                        <MenuItem key={category.id} value={category.id}>
+                          {category.nom}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Produit</InputLabel>
+                    <Select
+                      name="produit"
+                      value={formik.values.produit}
+                      onChange={handleProduitChange}
+                      error={formik.touched.produit && Boolean(formik.errors.produit)}
+                    >
+                      {filteredProduits.map((produit) => (
+                        <MenuItem key={produit.id} value={produit.id}>
+                          {produit.nom}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    id="prix"
+                    name="prix"
+                    label="Prix"
+                    type="number"
+                    disabled
+                    value={formik.values.prix}
+                    onChange={formik.handleChange}
+                    error={formik.touched.prix && Boolean(formik.errors.prix)}
+                    helperText={formik.touched.prix && formik.errors.prix}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    id="quantite"
+                    name="quantite"
+                    label="Quantite"
+                    type="number"
+                    value={formik.values.quantite}
+                    onChange={formik.handleChange}
+                    error={formik.touched.quantite && Boolean(formik.errors.quantite)}
+                    helperText={formik.touched.quantite && formik.errors.quantite}
+                  />
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    disabled
+                    id="montant"
+                    name="montant"
+                    label="Montant"
+                    type="number"
+                    value={formik.values.montant}
+                    onChange={formik.handleChange}
+                    error={formik.touched.montant && Boolean(formik.errors.montant)}
+                    helperText={formik.touched.montant && formik.errors.montant}
+                  />
+                </Grid>
+              </Grid>
+
+              
+            </Box>  
+            </div>
+            {/* <button
+              onClick={addProduct}
+              className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
+            >
+              Ajouter le Produit
+            </button> */}
+          
+
+          {/* Products List */}
+          <div className="mt-6 space-y-4">
+            {products.map((product:any, index) => (
+              <div key={index} className="flex items-center justify-between p-4 rounded-lg shadow-inner bg-gray-50">
+                <div className="flex items-center space-x-4">
+                  <span className="font-medium text-gray-600">{product?.produit?.nom}</span>
+                  <span className="font-semibold text-gray-800">
+                    {product.quantite} x fc :{product?.produit?.prixVente}
+                  </span>
+                </div>
+                <span className="font-bold text-gray-800">fc: {product.montant.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Invoice Creation Area */}
+        <section className="p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="mb-4 text-2xl font-semibold text-gray-700">Rédiger la Facture</h2>
+
+          {/* Client Information */}
+          <form  onSubmit={validateFacture} className="mb-4 space-y-4">
+            <input
+              type="text"
+              name="nom"
+              value={client.nom}
+              onChange={handleChange}
+              placeholder="Nom du client"
+              className={`w-full p-3 border rounded-lg focus:outline-none ${
+                clientFormik.touched.nom && clientFormik.errors.nom
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}     
+             
+            />
+            {clientFormik.touched.nom && clientFormik.errors.nom ? (
+              <div className="mt-1 text-sm text-red-500">{clientFormik.errors.nom}</div>
+            ) : null}
+            <input
+              type="text"
+              name="numero"
+              value={client.numero}
+              onChange={handleChange}
+              placeholder="numero du client"
+             
+              className={`w-full p-3 border rounded-lg focus:outline-none ${
+                clientFormik.touched.nom && clientFormik.errors.nom
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
+            />
+            {clientFormik.touched.numero&& clientFormik.errors.numero? (
+              <div className="mt-1 text-sm text-red-500">{clientFormik.errors.numero}</div>
+            ) : null}
+             <input
+              type="text"
+              name="adresse"
+              value={client.adresse}
+              onChange={handleChange}
+              placeholder="Adresse du client"
+              className={`w-full p-3 border rounded-lg focus:outline-none ${
+                clientFormik.touched.nom && clientFormik.errors.nom
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
+              
+            />
+              {clientFormik.touched.adresse && clientFormik.errors.adresse ? (
+              <div className="mt-1 text-sm text-red-500">{clientFormik.errors.adresse}</div>
+            ) : null}
+
+          {/* Selected Products Summary */}
+          <div className="mb-4 space-y-2">
+            {products.map((product:any, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <span className="text-gray-600">{product?.produit.nom}</span>
+                <span className="font-semibold text-gray-800">
+                  fc: {product?.produit.prixVente} x {product.quantite}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <hr className="my-4" />
+
+          {/* Total Amount */}
+          <div className="flex items-center justify-between mb-6">
+            <span className="font-medium text-gray-600">Montant Total :</span>
+            <span className="font-bold text-gray-800">fc: {totalAmount.toFixed(2)}</span>
+          </div>
+
+          {/* Validate Invoice Button */}
+          <button
+          disabled={loading}
+           type="submit"  // Assurez-vous que le bouton est de type "submit"
+            className="w-full px-4 py-2 text-white bg-green-600 rounded-lg shadow-md hover:bg-green-500"
+          >
+           {loading ? <CircularProgress size={24} /> : 'Validate Facture'}
+          </button>
+        </form>
+        
+        </section>
+        
+      </main>
     </div>
+
+            
+    </div>
+   
+
+    </>
     
   );
 };
 
-export default Caisse;
 
+export default CaisseVendeur

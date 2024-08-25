@@ -26,7 +26,6 @@ export interface AuthState {
   addStatus: 'idle' | 'loading' | 'succeeded' | 'failed',
   updateStatus: 'idle' | 'loading' | 'succeeded' | 'failed',
   deleteStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
- 
 }
 
 export interface DecodedToken {
@@ -261,3 +260,4 @@ const userSlice = createSlice({
 
 export default userSlice.reducer;
 export const { selectAll: selectAllUsers } = userAdapter.getSelectors((state: RootState) => state.users);
+export const selectCurrentUser = (state: RootState) => state.users.user;

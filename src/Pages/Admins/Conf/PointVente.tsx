@@ -90,7 +90,9 @@ const PointVente: React.FC = () => {
       }
       dispatch(updatePointVente({id,updatedPointVente: apiv}));
     } else {
-      dispatch(addPointVente(createPv));
+      dispatch(addPointVente(createPv)).then(()=>{
+        dispatch(fetchPointVentes());
+      });
     }
     handleClose();
   };
@@ -143,7 +145,7 @@ const PointVente: React.FC = () => {
             Nouveau
           </Button>
         </div>
-      </Stack>
+   </Stack>
     
 
 <div style={{ height: 400, width: '100%' }}>

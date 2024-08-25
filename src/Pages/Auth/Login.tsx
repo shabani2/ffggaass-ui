@@ -22,6 +22,7 @@ const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const users = useSelector((state: RootState) => selectAllUsers(state));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const auth = useSelector((state: RootState) => state.users);
   useSelector((state: RootState) => state.users);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -40,7 +41,7 @@ const Login = () => {
       //console.log('Login succeeded:', resultAction.payload);
       console.log('token : ',localStorage.getItem('jwt'))
       reset();  
-      navigate('/');      
+      navigate('/');       
       console.log(data);
       setLoginError(null);
     } else {

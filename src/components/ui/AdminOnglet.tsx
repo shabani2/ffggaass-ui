@@ -1,8 +1,11 @@
 import React from 'react'
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Home, Category, LocalShipping, ShoppingCart, Store, Settings, Person, Inventory } from '@mui/icons-material';
+import { Home, Category, LocalShipping, Store, Settings, Person, Inventory, People  } from '@mui/icons-material';
 import {Link } from 'react-router-dom';
 import routes from '@/Routes/AppRoute';
+import {ReceiptIcon, ShoppingCart } from 'lucide-react';
+
+
 
 
 
@@ -11,11 +14,14 @@ import routes from '@/Routes/AppRoute';
     'Acceuil': <Home />,
     'Produit': <Category />,
     'Livraisons': <LocalShipping />,
-    'Ventes': <ShoppingCart />,
+    'Bon d\'entre': <ReceiptIcon />,
     'Caisse': <Store />,
     'Stock': <Inventory />,
     'Configuration': <Settings />,
-    'Profile': <Person />
+    'Profile': <Person />,
+    'Clients' : <People/>,
+    'Commandes': <ShoppingCart/>
+    
   };
 const AdminOnglet = () => {
   return (

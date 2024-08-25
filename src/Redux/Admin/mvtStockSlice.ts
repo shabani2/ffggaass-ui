@@ -17,56 +17,6 @@ export const fetchMvtStocks = createAsyncThunk('mvtStock/fetchAll', async (_, { 
     return rejectWithValue((error as Error).message);
   }
 });
-// export const fetchMvtStocks = createAsyncThunk('mvtStock/fetchAll', async ({ page = 0, pageSize = 20 }, { rejectWithValue }) => {
-//   try {
-//     const response = await axiosInstance.get('/mvtstock', {
-//       params: { page, pageSize }
-//     });
-//     return {
-//       data: response.data.mvtStocks.map((ms: { _id: unknown }) => ({
-//         id: ms._id,
-//         ...ms,
-//       })),
-//       total: response.data.total
-//     };
-//   } catch (error) {
-//     return rejectWithValue((error as Error).message);
-//   }
-// });
-
-
-// interface FetchMvtStocksParams {
-//   page?: number;
-//   pageSize?: number;
-// }
-// interface FetchMvtStocksResponse {
-//   data: MvtStock[];
-//   total: number;
-// }
-
-// export const fetchMvtStocks = createAsyncThunk<
-//   FetchMvtStocksResponse,  // Type de retour
-//   FetchMvtStocksParams,   // Type des paramètres
-//   { rejectValue: string } // Type d'erreur
-// >(
-//   'mvtStock/fetchAll',
-//   async ({ page = 0, pageSize = 20 }, { rejectWithValue }) => {
-//     try {
-//       const response = await axiosInstance.get('/mvtstock', {
-//         params: { page, pageSize }
-//       });
-//       return {
-//         data: response.data.mvtStocks.map((ms: { _id: unknown}) => ({
-//           id: ms._id,
-//           ...ms,
-//         })),
-//         total: response.data.total
-//       };
-//     } catch (error) {
-//       return rejectWithValue((error as Error).message);
-//     }
-//   }
-// );
 
 export const addMvtStock = createAsyncThunk('mvtStock/add', async (newMvtStock: unknown, { rejectWithValue }) => {
   try {

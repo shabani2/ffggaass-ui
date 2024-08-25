@@ -7,8 +7,11 @@ const Livraison = lazy(()=>import('../Pages/Admins/Livraison'))
 const Produit = lazy(()=>import('../Pages/Admins/Produit'))
 const Profile = lazy(()=>import('../Pages/Admins/Profile'))
 const Stock = lazy(()=>import('../Pages/Admins/Stock'))
-const Vente = lazy(()=>import('../Pages/Admins/Vente'))
+//const Vente = lazy(()=>import('../Pages/Admins/Vente'))
 const Configuration = lazy(()=>import('../Pages/Admins/Configuration'))
+const Client = lazy(()=>import('../Pages/Admins/ClientPage.tsx'))
+const commande = lazy(()=>import('../Pages/Admins/CommandePage.tsx'))
+const bonEntre = lazy(()=>import('../Pages/Admins/BonEntrePage.tsx'))
 
 // les composants de la configuration
 const General = lazy(()=>import('../Pages/Admins/Conf/Generale'))
@@ -44,9 +47,24 @@ const coreRoutes = [
   },
   {
     path: '/vente',
-    title: 'Ventes',
-    component: Vente,
+    title: 'Bon d\'entre',
+    component: bonEntre,
   },
+  {
+    path: '/client',
+    title: 'Clients',
+    component: Client,
+  },
+  {
+    path: '/commande',
+    title: 'Commandes',
+    component: commande,
+  },
+  // {
+  //   path: '/bon-entre',
+  //   title: 'Bon d\'entre',
+  //   component: bonEntre,
+  // },
   {
     path: '/caisse',
     title: 'Caisse',

@@ -1,176 +1,87 @@
-
-import React, { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
+import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
+import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { DataGrid, GridColDef, GridRowParams, GridRowSelectionModel } from '@mui/x-data-grid';
-import { Button, IconButton, Modal, Box, TextField, Select, MenuItem, FormControl, InputLabel, Badge } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
-import { RootState } from '@/Redux/Store';
-import { fetchMvtStocks, addMvtStock, updateMvtStock, deleteMvtStock, selectAllMvtStocks,fetchFilteredMvtStocks,fetchVendeurdMvtStocks} from '@/Redux/Admin/mvtStockSlice';
-import { fetchProduits, selectAllProduits } from '@/Redux/Admin/productSlice'; // Assuming productSlice is already set up
-import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice'; // Assuming categorySlice is already set up
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { MvtStock, PointVente, Produit } from '@/Utils/dataTypes';
-import { AppDispatch } from '@/Redux/Store';
-import { EntityId } from '@reduxjs/toolkit';
-import { CheckCircleIcon } from 'lucide-react';
+import { Produit, PointVente1, Livraison } from '@/Utils/dataTypes';
+import {  DownloadIcon, UploadIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { selectCurrentUser } from '@/Redux/Auth/userSlice';
+import { fetchCategories } from '@/Redux/Admin/categorySlice';
+import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
+import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { fetchVentesByPointVente, searchVentes, selectAllVentes } from '@/Redux/Admin/venteSlice';
 
-const style = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
-const validationSchema = yup.object({
-  operation: yup.string().required('Operation is required'),
-  quantite: yup.number().required('Quantite is required').min(0, 'Quantite must be at least 0'),
-  montant: yup.number().required('Montant is required').min(0, 'Montant must be at least 0'),
-  statut: yup.string().required('Statut is required'),
-  produit: yup.string().required('Produit is required'),
-  pointVente: yup.string().required('PointVente is required'),
-});
-
-const VenteVendeur: React.FC = () => {
-  const dispatch : AppDispatch = useDispatch<AppDispatch>();
-  const mvtStocks = useSelector((state: RootState) => selectAllMvtStocks(state));
-  const produits = useSelector((state: RootState) => selectAllProduits(state));
-  const categories = useSelector((state: RootState) => selectAllCategories(state));
-  const loading = useSelector((state: RootState) => state.mvtStock.loading);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedMvtStock, setSelectedMvtStock] = useState<MvtStock | null>(null);
+const VentePage = () => {
+  const dispatch :AppDispatch= useDispatch();
+  const ventes= useSelector(selectAllVentes);  
+  const user = useSelector(selectCurrentUser);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const loading = useSelector((state: RootState) => state.vente.loading);
+  const error = useSelector((state: RootState) => state.vente.error);
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
-  const initPs = useSelector((state:RootState)=>state.pointVente.initPS);
-
-  useEffect(() => {
-dispatch(fetchVendeurdMvtStocks({ operation:'vente', pointVenteId:initPs }));
-    dispatch(fetchProduits());
-    dispatch(fetchCategories());
-  }, [dispatch]);
-
-  const formik = useFormik({
-    initialValues: {
-      operation: 'vente',
-      quantite: 0,
-      montant: 0,
-      statut: 'unvalidate',
-      produit: '',
-      pointVente: '',
-    },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      const produit = produits.find(prod => prod.id === values.produit);
-      const pointVente = categories.find(cat => cat.id === values.pointVente);
-      const newMvtStock = { ...values, produit: produit!, pointVente: pointVente! };
-      const data ={
-        operation : newMvtStock.operation,
-        montant : newMvtStock.montant,
-        quantite : newMvtStock.quantite,
-        produitId : newMvtStock.produit?._id,
-        pointVenteId : newMvtStock.pointVente?._id
-      }
-      if (selectedMvtStock) {
-        dispatch(updateMvtStock({ id: selectedMvtStock.id, mvtStock: data})).then(() => {
-          dispatch(fetchVendeurdMvtStocks({ operation:'vente', pointVenteId:initPs }));
-        });
-      } else {
-        dispatch(addMvtStock(data)).then(() => {
-          dispatch(fetchVendeurdMvtStocks({ operation:'vente', pointVenteId:initPs }));
-        });
-      }
-      setModalOpen(false);
-      setSelectedMvtStock(null);
-    },
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 10,
+    page: 0,
   });
 
-  const handleEditClick = (mvtStock: MvtStock) => {
-    setSelectedMvtStock(mvtStock);
-    formik.setValues({
-      operation: mvtStock.operation,
-      quantite: mvtStock.quantite,
-      montant: mvtStock.montant,
-      statut: mvtStock.statut,
-      produit: mvtStock.produit.id.toString(),
-      pointVente: mvtStock.pointVente.id.toString(),
-    });
-    setModalOpen(true);
-  };
+  
 
-  const handleDeleteClick = (id: EntityId) => {
-    dispatch(deleteMvtStock(id.toString())).then(() => {
-      dispatch(fetchMvtStocks());
-    });
-  };
-
-  const handleAddClick = () => {
-    setSelectedMvtStock(null);
-    formik.resetForm();
-    setModalOpen(true);
-  };
+  useEffect(() => {
+    console.log('pvname=>',user?.pointVente?.nom)
+    dispatch(fetchVentesByPointVente(user?.pointVente?.nom));
+  }, [dispatch]); 
 
   const columns: GridColDef[] = [
-    { field: 'operation', headerName: 'Operation', width: 150 },
-    { field: 'quantite', headerName: 'Quantite', width: 150 },
-    { field: 'montant', headerName: 'Montant', width: 150 },
-    { 
-      field: 'statut', 
-      headerName: 'Statut', 
-      width: 150 ,
+    {
+      field: 'numéro',
+      headerName: 'N°',
+      width: 70,
       renderCell: (params) => {
-        const statut = params.value as string;
-        return (
-          <Badge
-            badgeContent={statut === 'unvalidate' ? '': <CheckCircleIcon />}
-            color={statut === 'unvalidate' ? 'error' : 'success'}
-          >
-            {statut}
-          </Badge>
-        );
-      },     
-      
+        const startIndex = paginationModel.page * paginationModel.pageSize;
+      return startIndex + params.api.getSortedRowIds().indexOf(params.id) + 1;
+      },
     },
     {
       field: 'produit',
       headerName: 'Produit',
-      width: 200,
-      valueGetter: (params:Produit) => params?.nom,
+      width: 100,
+      valueGetter: (params: Produit1) => params?.nom,
     },
     {
       field: 'pointVente',
-      headerName: 'PointVente',
-      width: 200,
-      valueGetter: (params:PointVente) => params?.nom,
+      headerName: 'Point de Vente',
+      width: 150,
+      valueGetter: (params: PointVente1) => params?.nom,
     },
+    { field: 'quantite', headerName: 'Quantité', width: 100 },
+    { field: 'montant', headerName: 'Montant', width: 150 },
+    
     {
       field: 'createdAt',
-      headerName: 'Date d\'operation',
+      headerName: "Date d'opération",
       width: 200,
-      renderCell: (params) => {
-        return format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss');
-      },
+      renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 150,
+      width: 100,
       renderCell: (params) => (
         <>
           <IconButton
             color="primary"
-            onClick={() => handleEditClick(params.row as MvtStock)}
+            // onClick={() => handleEditClick(params.row as MvtStock)}
           >
             <EditIcon />
           </IconButton>
           <IconButton
             color="secondary"
-            onClick={() => handleDeleteClick(params.row.id)}
+            onClick={() => handleDelete(params.row.id)}
           >
             <DeleteIcon />
           </IconButton>
@@ -178,120 +89,120 @@ dispatch(fetchVendeurdMvtStocks({ operation:'vente', pointVenteId:initPs }));
       ),
     },
   ];
+  
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-expect-error
+  function handleDelete(id) {
+    console.log('hello',id)
+  }
+
+  const handleUploadClick = () => {
+    if (inputRef.current) {
+      inputRef.current.click();
+    }
+  };
+
+  const handleExport = (format: 'csv' | 'xlsx') => {
+    dispatch(exportMvtStock(format)).then((action) => {
+      if (action.meta.requestStatus === 'fulfilled') {
+        const url = window.URL.createObjectURL(new Blob([action.payload]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `mvtStock.${format}`);
+        document.body.appendChild(link);
+        link.click();
+      }
+    });
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      dispatch(importMvtStock(file));
+      dispatch(fetchMvtStocks());
+      dispatch(fetchProduits());
+      dispatch(fetchCategories());
+    }
+  }; 
 
   return (
-    <div>
-      <Button variant="contained" color="primary" onClick={handleAddClick}>
-        Add MvtStock
-      </Button>
-      <DataGrid
-        rows={mvtStocks}
-        columns={columns}
-        pageSize={5}
-        loading={loading}
-        checkboxSelection
-        onSelectionModelChange={(newSelection: React.SetStateAction<GridRowSelectionModel>) => {
-          setSelectionModel(newSelection);
-        }}
-        selectionModel={selectionModel}
-      />
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <h2 id="modal-modal-title">MvtStock</h2>
-          <form onSubmit={formik.handleSubmit}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Operation</InputLabel>
-              <Select
-                name="operation"
-                value={formik.values.operation}
-                onChange={formik.handleChange}
-                error={formik.touched.operation && Boolean(formik.errors.operation)}
-                fullWidth
-              >
-                <MenuItem value="vente">Vente</MenuItem>
-                <MenuItem value="livraison">Livraison</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              fullWidth
-              margin="normal"
-              id="quantite"
-              name="quantite"
-              label="Quantite"
-              value={formik.values.quantite}
-              onChange={formik.handleChange}
-              error={formik.touched.quantite && Boolean(formik.errors.quantite)}
-              helperText={formik.touched.quantite && formik.errors.quantite}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              id="montant"
-              name="montant"
-              label="Montant"
-              value={formik.values.montant}
-              onChange={formik.handleChange}
-              error={formik.touched.montant && Boolean(formik.errors.montant)}
-              helperText={formik.touched.montant && formik.errors.montant}
-            />
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Statut</InputLabel>
-              <Select
-                name="statut"
-                value={formik.values.statut}
-                onChange={formik.handleChange}
-                error={formik.touched.statut && Boolean(formik.errors.statut)}
-                fullWidth
-              >
-                <MenuItem value="validate">Validate</MenuItem>
-                <MenuItem value="unvalidate">Unvalidate</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Produit</InputLabel>
-              <Select
-                name="produit"
-                value={formik.values.produit}
-                onChange={formik.handleChange}
-                error={formik.touched.produit && Boolean(formik.errors.produit)}
-                fullWidth
-              >
-                {produits.map((produit) => (
-                  <MenuItem key={produit.id} value={produit.id}>
-                    {produit.nom}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>PointVente</InputLabel>
-              <Select
-                name="pointVente"
-                value={formik.values.pointVente}
-                onChange={formik.handleChange}
-                error={formik.touched.pointVente && Boolean(formik.errors.pointVente)}
-                fullWidth
-              >
-                {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.nom}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button color="primary" variant="contained" fullWidth type="submit">
-              Submit
+  <>
+     <div className='p-[2rem] w-full'>
+     <div>
+        <Stack direction="row" spacing={3}>
+          <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
+            <Typography variant="h4">Gestion de Vente</Typography>            
+          </Stack>
+          <div>            
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <div>
+                <input
+                  type="file"
+                  ref={inputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                />
+                <Button
+                  color="inherit"
+                  startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}
+                  onClick={handleUploadClick}
+                  disabled={loading}
+                >
+                  Upload
+                </Button>
+                {loading && <p>Loading...</p>}
+                {error && <p>Error: {error}</p>}
+              </div>
+              <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />} onClick={() => handleExport('xlsx')}>
+                Export
+              </Button>
+            </Stack>
+        </div>
+        </Stack>
+      </div>
+      <div style={{ width: '95%',maxHeight:'500px'}}>
+        
+        <Box >
+        <div className='flex flex-row justify-between w-full pt-5 pb-2'>
+          <div className='w-2/5'>
+            <h1 className='text-3xl text-blue-500'>fiche de vente journaliere</h1>
+          </div>
+          <div className='flex justify-end w-1/5'>
+            <Button variant="contained" color="primary">
+              Nouveau livraison
             </Button>
-          </form>
+          </div>
+        </div>
+              
+          {ventes.length>0 ?
+           <DataGrid
+           rows={ventes} 
+           columns={columns}
+           pagination
+           paginationMode="client"
+           rowCount={ventes.length}
+           onPaginationModelChange={(newPaginationModel) => setPaginationModel(newPaginationModel)}
+           loading={loading}
+           checkboxSelection
+           onRowSelectionModelChange={(newSelection: React.SetStateAction<GridRowSelectionModel>) => {
+             setSelectionModel(newSelection);
+           }}
+           getRowId={(row)=>row._id}
+           rowSelectionModel={selectionModel}
+           paginationModel={paginationModel}
+         />
+          :
+          <div>no content</div>}
         </Box>
-      </Modal>
-    </div>
+       </div>
+     </div>
+
+</>
+
   );
 };
 
-export default VenteVendeur;
+export default VentePage;
+
+
+

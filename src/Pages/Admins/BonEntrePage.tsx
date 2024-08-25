@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -5,7 +6,7 @@ import {
   searchLivraisonsByPointVente, 
   selectAllLivraisons 
 } from '@/Redux/Admin/livraisonSlice';
-import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Button, IconButton, Stack, Typography , Modal, TextField, MenuItem, Grid} from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,9 +18,11 @@ import { fetchCategories } from '@/Redux/Admin/categorySlice';
 import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
 import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+//import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material';
 
 
-const LivraisonVendeur = () => {
+
+const BonEntrePage = () => {
   const dispatch :AppDispatch= useDispatch();
   const livraisons = useSelector(selectAllLivraisons);  
   const user = useSelector(selectCurrentUser);
@@ -32,8 +35,19 @@ const LivraisonVendeur = () => {
     page: 0,
   });
 
+  const [produits, setProduits] = useState<Produit1[]>([]);
+  const [pointVente, setPointVente] = useState<PointVente1 | null>(null);
+  const [category, setCategory] = useState<string>('');
+  const [produit, setProduit] = useState<string>('');
+  const [prix, setPrix] = useState<number | string>('');
+  const [quantite, setQuantite] = useState<number | string>('');
+  const [montant, setMontant] = useState<number | string>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [categories, setCategories] = useState<{ _id: string; nom: string }[]>([]);
+  const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null)
+
   useEffect(() => {
-    console.log('pv=>',user?.pointVente?.nom)
     dispatch(searchLivraisonsByPointVente(user?.pointVente?.nom));
   }, [dispatch]); 
 
@@ -61,21 +75,21 @@ const LivraisonVendeur = () => {
     },
     { field: 'quantite', headerName: 'Quantité', width: 100 },
     { field: 'montant', headerName: 'Montant', width: 150 },
-    {
-      field: 'statut',
-      headerName: 'Statut',
-      width: 150,
-      renderCell: (params) => {
-        const statut = params.value as string;
-        return (
-          <Chip
-            color={statut === 'unvalidate' ? 'error' : 'success'}
-            label={statut}
-            size="small"
-          />
-        );
-      },
-    },
+    // {
+    //   field: 'statut',
+    //   headerName: 'Statut',
+    //   width: 150,
+    //   renderCell: (params) => {
+    //     const statut = params.value as string;
+    //     return (
+    //       <Chip
+    //         color={statut === 'unvalidate' ? 'error' : 'success'}
+    //         label={statut}
+    //         size="small"
+    //       />
+    //     );
+    //   },
+    // },
     {
       field: 'createdAt',
       headerName: "Date d'opération",
@@ -140,11 +154,26 @@ const LivraisonVendeur = () => {
     }
   }; 
 
+  const handleOpenModal = (mode: 'create' | 'edit', delivery?: Livraison) => {
+    setModalMode(mode);
+    setSelectedDelivery(delivery || null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedDelivery(null);
+  };
+
+  const handleSave = () => {
+    // Handle save logic here
+    handleCloseModal();
+  };
+
   return (
   <>
-  
-      <div className='p-[2rem] w-full'>
-      <div >
+   <div className='p-[2rem] w-full bg-gray-200 h-screen'>
+     <div>
         <Stack direction="row" spacing={3}>
           <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
             <Typography variant="h4">Gestion d'entre en stock</Typography>            
@@ -176,7 +205,7 @@ const LivraisonVendeur = () => {
         </div>
         </Stack>
       </div>
-      <div style={{ width: '95%',maxHeight:'500px'}}>
+      <div style={{ width: '99%',maxHeight:'500px'}} className='mt-[25px]'>
         
         <Box >
         <div className='flex flex-row justify-between w-full pt-5 pb-2'>
@@ -184,8 +213,12 @@ const LivraisonVendeur = () => {
             <h1 className='text-3xl text-blue-500'>Tableau de bon d'entree en stock</h1>
           </div>
           <div className='flex justify-end w-1/5'>
-            <Button variant="contained" color="primary">
-              Nouveau livraison
+            <Button 
+              variant="contained" color="primary"
+              onClick={()=>handleOpenModal('create')}
+              >
+              
+              Nouvel entre
             </Button>
           </div>
         </div>
@@ -209,15 +242,125 @@ const LivraisonVendeur = () => {
           :
           <div>no content</div>}
         </Box>
-    </div>
-      </div>
+
+        <Modal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Box
+          className="max-w-lg p-6 mx-auto mt-10 bg-white rounded"
+          sx={{
+            position: 'absolute',
+            top: '40%',
+            left: '50%',
+            
+            transform: 'translate(-40%, -50%)',
+            width: '90%',
+            maxWidth: '700px',
+          }}
+        >
+          <Typography variant="h6" component="h2" className="mb-4">
+            {modalMode === 'create' ? 'Bon d\'entree ' : 'Modifier Livraison'}
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                select
+                label="Point de Vente"
+                value={pointVente?._id || ''}
+                onChange={(e) => setPointVente(e.target.value)}
+              >
+                <MenuItem value="1">Point de Vente 1</MenuItem>
+                <MenuItem value="2">Point de Vente 2</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                select
+                label="Catégorie"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {categories.map((cat) => (
+                  <MenuItem key={cat._id} value={cat._id}>
+                    {cat.nom}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                select
+                label="Produit"
+                value={produit}
+                onChange={(e) => setProduit(e.target.value)}
+              >
+                {produits.map((prod) => (
+                  <MenuItem key={prod._id} value={prod._id}>
+                    {prod.nom}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Prix"
+                value={prix}
+                onChange={(e) => setPrix(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Quantité"
+                value={quantite}
+                onChange={(e) => setQuantite(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Montant"
+                value={montant}
+                onChange={(e) => setMontant(e.target.value)}
+                disabled
+              />
+            </Grid>
+          </Grid>
+          <Box className="flex justify-end mt-4">
+            <button 
+            onClick={handleSave}
+            className="px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
+            >
+              {modalMode === 'create' ? 'Créer' : 'Modifier'}
+            </button>
+            <button 
+            onClick={handleCloseModal}
+            className="px-4 py-2 m-3 text-white bg-red-600 rounded-lg shadow-md bg--600 hover:bg-red-500">
+              Annuler
+            </button>
+          </Box>
+        </Box>
+      </Modal>
+       </div>
+   </div>
+     
 
 </>
 
   );
 };
 
-export default LivraisonVendeur;
+export default BonEntrePage;
 
 
 

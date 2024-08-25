@@ -246,10 +246,10 @@ const Vente: React.FC = () => {
         </Stack>
       </div>
 
-      <div style={{ width: '90%', display:'flex', justifyContent:'center', marginTop:'1rem'}}>
+      <div style={{ width: '95%',height:'500px'}}>
         
-        <Box sx={{ height: 500, width: '95%',boxShadow: 3, borderRadius: '8px', overflow: 'hidden', padding: 5, margin:3 }}>
-        <Typography className='text-blue-500' sx={{fontSize:'2rem',margin:'3 0'}}>Tableau de bon de livraisons</Typography>
+        <Box >
+        <Typography className='text-blue-500' sx={{fontSize:'2em',margin:'3 0'}}>Tableau de bon de livraisons</Typography>
           {mvtStocks.length>0 ?
           <DataGrid
             rows={mvtStocks}
@@ -260,13 +260,12 @@ const Vente: React.FC = () => {
             onSelectionModelChange={(newSelection: React.SetStateAction<GridRowSelectionModel>) => {
               setSelectionModel(newSelection);
             }}
-            selectionModel={selectionModel}
-           
+            selectionModel={selectionModel}           
           />
           :
-          <div>no content</div>
-}
+          <div>no content</div>}
         </Box>
+       </div>
         <Modal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -364,7 +363,7 @@ const Vente: React.FC = () => {
             </form>
           </Box>
         </Modal>
-      </div>
+     
     </>
   );
 };

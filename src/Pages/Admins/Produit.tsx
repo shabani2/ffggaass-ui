@@ -24,7 +24,7 @@ interface Produit1 {
   _id: string;
   nom: string;
   prix: number;
-  prixVente:number;
+  //prixVente:number;
   category: Category;
   createdAt: string;
   updatedAt: string;
@@ -115,9 +115,9 @@ const Produit: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
-    { field: 'nom', headerName: 'Nom', width: 150 },
-    { field: 'prix', headerName: 'Prix', width: 100 },
-    { field: 'prixVente', headerName: 'Prix de vente', width: 100 },
+    { field: 'nom', headerName: 'Nom', width: 200 },
+    { field: 'prix', headerName: 'Prix', width: 200 },
+    { field: 'prixVente', headerName: 'Prix de vente', width: 200 },
     {
       field: 'category',
       headerName: 'Category',
@@ -152,6 +152,8 @@ const Produit: React.FC = () => {
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
           <Typography variant="h4">Gestion de Produit</Typography>
+        </Stack>
+        <div>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
               Import
@@ -160,19 +162,23 @@ const Produit: React.FC = () => {
               Export
             </Button>
           </Stack>
-        </Stack>
-        <div>
-            <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={() => handleOpenModal()}>
-              Nouveau
-            </Button>
         </div>
-      </Stack>
+          
+        </Stack>  
 
 
 
-      <div style={{ height: 500, width: '95%' }}> 
-        <Box sx={{boxShadow: 3, borderRadius: '8px', overflow: 'hidden', padding: 5, height: 500, margin:3}}>
-          <Box><Typography className='m-3 text-4xl text-blue-500' sx={{fontSize:'2rem',margin:'3 0'}}>Liste de produits</Typography></Box>
+      <div style={{ height: 500, width: '99%' }} className='mt-[25px]'> 
+        <Box>
+          <Box className='flex justify-between'>
+            <Typography className='m-3 text-4xl text-blue-500' sx={{fontSize:'2rem',margin:'3 0'}}>Liste de produits</Typography>
+            <div>
+                <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={() => handleOpenModal()}>
+                  Nouveau
+                </Button>
+            </div>
+                
+          </Box>
           <DataGrid
             rows={produits}
             columns={columns}
@@ -191,6 +197,22 @@ const Produit: React.FC = () => {
           <Box sx={style}>
             <Typography sx={{margin:2}}>{selectedProduct? 'Modifier Produit' : 'Ajouter Produit'}</Typography>
             <form onSubmit={formik.handleSubmit}>
+            <FormControl fullWidth margin="normal">
+                <InputLabel id="category-label">Category</InputLabel>
+                <Select
+                  labelId="category-label"
+                  name="category"
+                  value={formik.values.category}
+                  onChange={formik.handleChange}
+                  error={formik.touched.category && Boolean(formik.errors.category)}
+                >
+                  {categories.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.nom}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
                 name="nom"
                 label="Nom"
@@ -223,22 +245,7 @@ const Produit: React.FC = () => {
                 fullWidth
                 margin="normal"
               />
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="category-label">Category</InputLabel>
-                <Select
-                  labelId="category-label"
-                  name="category"
-                  value={formik.values.category}
-                  onChange={formik.handleChange}
-                  error={formik.touched.category && Boolean(formik.errors.category)}
-                >
-                  {categories.map((category) => (
-                    <MenuItem key={category.id} value={category.id}>
-                      {category.nom}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+             
               <Button type="submit" variant="contained" color="primary" fullWidth>
                 {selectedProduct ? 'Update' : 'Add'}
               </Button>

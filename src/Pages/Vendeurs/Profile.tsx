@@ -35,7 +35,8 @@ const Profile = () => {
 
   return (
     <>
-      <Stack direction="row" spacing={3}>
+     <div className='p-[2rem] w-full'>
+     <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
           <Typography variant="h4">Profile</Typography>
          
@@ -76,6 +77,7 @@ const Profile = () => {
         </Grid>
       </Grid>
     </Stack>
+     </div>
     </>
   )
 }

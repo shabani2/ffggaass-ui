@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Drawer, Box, CssBaseline, Divider, Avatar, useTheme, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Drawer, Box, CssBaseline, Divider, Avatar, useTheme, useMediaQuery, Button, Menu, MenuItem } from '@mui/material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {  Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -12,10 +12,12 @@ import './../global.css'
 import AdminOnglet from '@/components/ui/AdminOnglet';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/Redux/Store';
-import { findUserById} from '@/Redux/Auth/userSlice';
+import { findUserById, logoutUser} from '@/Redux/Auth/userSlice';
 import VendeurOnglet from '@/components/ui/VendeurOnglet';
 import { jwtDecode } from 'jwt-decode';
 import { setInitPS } from '@/Redux/Admin/pointVenteSlice';
+//import { LogoutIcon } from '@lucid/icons';
+import LogoutIcon from '@mui/icons-material/Logout'
 //import { makeStyles } from '@material-ui/core/styles';
 
 const drawerWidth = 350;
@@ -119,6 +121,7 @@ const MainLayout: React.FC = () => {
 /********************les deux variables suivantes sont de state qui concerne l'utilisateurs connecte */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { user, status, error } = useSelector((state: RootState) => state.users);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const [userId, setUserId] = useState<string>('');
 const dispatch = useDispatch<AppDispatch>();
 
@@ -148,6 +151,28 @@ const dispatch = useDispatch<AppDispatch>();
     }
   },[dispatch,user])
 
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  
+
+  // Fonction pour ouvrir le menu
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Fonction pour fermer le menu
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout= ()=>{
+    dispatch(logoutUser())
+  }
+
+
+  
+  // Exemple de données pour le dropdown
+
   return (
     <Box sx={{ display: 'flex' , minWidth: '100vw'}}>
       <CssBaseline />
@@ -171,11 +196,27 @@ const dispatch = useDispatch<AppDispatch>();
             <Typography variant="h6" noWrap>
               {`${user?.nom} ${user?.postnom}`}
             </Typography>
-            <Typography variant="body2" style={{ lineHeight: 1, margin : '0 auto' }}>
+            {/* <Typography variant="body2" style={{ lineHeight: 1, margin : '0 auto' }}>
               {user?.role}
-            </Typography>
+            </Typography> */}
           </div>
+        
+        <div>
+      <Button onClick={handleClick}>
+        {/* {selectedItem || 'Select an option'} */}
         <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem>role : {user?.role}</MenuItem>
+        <MenuItem> point vente : {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}</MenuItem>
+        <Divider/>
+        <MenuItem onClick={handleLogout}><LogoutIcon /> se deconnecter</MenuItem>
+      </Menu>
+    </div>
         </Toolbar>
       </AppBarStyled>
      
@@ -215,12 +256,8 @@ const dispatch = useDispatch<AppDispatch>();
       <Divider />
       {user?.role=='Vendeur' ? <VendeurOnglet/> : <AdminOnglet/>}
       {/* <AdminOnglet/> */}
-    </Drawer>
-      {/* <Main open={!isMobile && open}  className='min-h-screen p-5 bg-green-500'>
-        <DrawerHeader />
-        <Outlet/>
-      </Main> */}
-      <Main open={!isMobile && open} className='bg-white ' sx={{minHeight:'100vh',width:`100%`,  padding:'2rem'}}>
+    </Drawer>      
+      <Main open={!isMobile && open} className='bg-white ' sx={{minHeight:'100vh',width:`100%`,  padding:'0'}}>
         <DrawerHeader />
         <Outlet />
       </Main>

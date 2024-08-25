@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Button, Modal, Box, TextField, Select, MenuItem, InputLabel, FormControl, IconButton } from '@mui/material';
+import { Button, Modal, Box, TextField, Select, MenuItem, InputLabel, FormControl, IconButton, Stack, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSeuils, addSeuil, updateSeuil, deleteSeuil, selectAllSeuils } from '@/Redux/Admin/seuilSlice';
 import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice';
@@ -9,7 +9,9 @@ import * as Yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import { EntityId } from '@reduxjs/toolkit';
-import { EditIcon, DeleteIcon } from 'lucide-react';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { UploadIcon, DownloadIcon, PlusIcon } from 'lucide-react';
 
 // Define the types for the form values
 interface SeuilFormValues {
@@ -116,7 +118,7 @@ const Seuil: React.FC = () => {
    // { field: 'id', headerName: 'ID', width: 150 },
     { field: 'produit', headerName: 'Produit', width: 200, valueGetter: (params:Produit) => params?.nom },
     { field: 'quantite', headerName: 'Quantité', width: 150 },
-    { field: 'category', headerName: 'Category', width: 200, valueGetter: (params:SeuilRecord) => params?.produit?.category?.nom || ''},
+    // { field: 'category', headerName: 'Category', width: 200, valueGetter: (params:Produit1) => params?.category.nom || ''},
    
     {
       field: 'actions',
@@ -144,14 +146,23 @@ const Seuil: React.FC = () => {
 
   return (
     <>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => handleOpen()}
-        style={{ marginBottom: '16px' }}
-      >
+     <Stack direction="row" spacing={3}>
+        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
+          <Typography variant="h4">Gestion point de seuil de stock</Typography>          
+        </Stack>
+        <div>         
+          <Button
+            startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpen()}
+            style={{ marginBottom: '16px' }}
+          >
         Add New Seuil
       </Button>
+        </div>
+   </Stack>
+      
       <DataGrid
         rows={seuils}
         columns={columns}
