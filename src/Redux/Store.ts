@@ -9,9 +9,11 @@ import livraisonReducer from './Admin/livraisonSlice';
 import venteReducer from './Admin/venteSlice';
 import commandeReducer from './Admin/commandeSlice';
 import clientReducer from './Admin/clientSlice';
-import situationVenteReducer from './Admin/situationVenteSlice';
-import situationLivraisonReducer from './Admin/situationLivraisonSlice';
-import situationReducer from '@/Redux/Global/situationSlice'
+import bonEntreReducer from './Admin/bonEntreSlice';
+import stockVariationReducer from './Admin/stockVariationSlice';
+import stockLocalReducer from './Admin/stockLocalSlice';
+
+
 
 export const Store = configureStore({
   reducer: {
@@ -25,9 +27,11 @@ export const Store = configureStore({
     vente: venteReducer,
     commande: commandeReducer,
     clients : clientReducer,
-    situationVente:situationVenteReducer,
-    situationLivraison:situationLivraisonReducer,
-    situations:situationReducer
+    bonEntre:bonEntreReducer,
+    stockVariation : stockVariationReducer,
+    stockLocal:stockLocalReducer
+   
+  
   },
 });
 

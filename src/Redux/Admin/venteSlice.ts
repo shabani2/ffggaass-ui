@@ -119,6 +119,7 @@ export const importVentes = createAsyncThunk('vente/import', async (file: File,{
 
 const initialState = venteAdapter.getInitialState({
   loading: false,
+  status : '',
   error: null,
   total: 0,
 });
@@ -145,15 +146,19 @@ const venteSlice = createSlice({
       })
       .addCase(addVente.pending, (state) => {
         state.loading = true;
+        state.status = 'pending'
         state.error = null;
       })
       .addCase(addVente.fulfilled, (state, action) => {
         state.loading = false;
+        state.status = 'fulfilled'
         venteAdapter.addOne(state, action.payload);
       })
       .addCase(addVente.rejected, (state, action) => {
         state.loading = false;
          //@ts-ignore
+         state.status = 'failed';
+          //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(updateVente.pending, (state) => {

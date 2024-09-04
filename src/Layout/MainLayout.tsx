@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Drawer, Box, CssBaseline, Divider, Avatar, useTheme, useMediaQuery, Button, Menu, MenuItem } from '@mui/material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {  Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
+import { Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { styled, alpha } from '@mui/material/styles';
 import { Outlet } from 'react-router-dom';
@@ -19,6 +19,8 @@ import { setInitPS } from '@/Redux/Admin/pointVenteSlice';
 //import { LogoutIcon } from '@lucid/icons';
 import LogoutIcon from '@mui/icons-material/Logout'
 //import { makeStyles } from '@material-ui/core/styles';
+import { FaBell } from 'react-icons/fa';
+import { Badge,Tooltip } from '@mui/material';
 
 const drawerWidth = 350;
 
@@ -176,7 +178,7 @@ const dispatch = useDispatch<AppDispatch>();
   return (
     <Box sx={{ display: 'flex' , minWidth: '100vw'}}>
       <CssBaseline />
-      <AppBarStyled position="fixed" open={!isMobile && open} sx={{background:'#6B7280'}} >
+      <AppBarStyled position="fixed" open={!isMobile && open} sx={{background:'#374151'}} >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -192,13 +194,20 @@ const dispatch = useDispatch<AppDispatch>();
             {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-center' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-center' }}>
+          <Typography variant="body2" style={{ lineHeight: 1, margin : ' auto',marginRight:'22px' }} className=''>
+              <Tooltip title={`${30} commandes en attente`} className=''>
+                <IconButton aria-label="notifications">
+                    <Badge badgeContent={30} color="secondary">
+                        <FaBell size={32} className='text-gray-50' />
+                    </Badge>
+                </IconButton>
+            </Tooltip>
+            </Typography>
             <Typography variant="h6" noWrap>
               {`${user?.nom} ${user?.postnom}`}
             </Typography>
-            {/* <Typography variant="body2" style={{ lineHeight: 1, margin : '0 auto' }}>
-              {user?.role}
-            </Typography> */}
+           
           </div>
         
         <div>

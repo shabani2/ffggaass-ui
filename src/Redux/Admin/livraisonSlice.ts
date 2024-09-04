@@ -4,9 +4,6 @@ import { createSlice, createAsyncThunk, createEntityAdapter, EntityId } from '@r
 import axiosInstance from '@/Utils/axiosInstance';
 import { Livraison } from '@/Utils/dataTypes'; // Assurez-vous que l'interface Livraison est définie correctement
 
-
-
-
 const livraisonAdapter = createEntityAdapter<Livraison>(
   {
     //@ts-ignore
@@ -109,6 +106,26 @@ export const searchLivraisonsByPointVente = createAsyncThunk(
   }
 );
 
+export const fetchExcludedLivraisons = createAsyncThunk(
+  'livraisons/fetchExcluded',
+  async (pointVenteQuery: unknown, thunkApi) => {
+    try {
+      const response = await axiosInstance.get('/livraison/exclude-by-pointVente', {
+        params: { pointVenteQuery },
+      });
+
+      // Tri des résultats par ordre décroissant de date
+      const sortedLivraisons = response.data.sort(
+        (a: Livraison, b: Livraison) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      return sortedLivraisons;
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response?.data?.message || 'Erreur lors du chargement des livraisons');
+    }
+  }
+);
+
 // Exportation des données
 export const exportLivraison = createAsyncThunk('livraison/export', async (format: 'csv' | 'xlsx') => {
   const response = await axiosInstance.get(`/file/livraison/export?format=${format}`, {
@@ -138,8 +155,28 @@ export const importLivraison = createAsyncThunk('livraison/import', async (file:
   }
 });
 
+export const updateLivraisonStatut = createAsyncThunk(
+  'livraison/updateStatut',
+  //@ts-ignore
+  async ({ id, statut }: { id: string; statut: string }) => {
+    try {
+      const response = await axiosInstance.put(`/livraison/statut/${id}/${statut}`, { id,statut });
+      return response.data;
+    } catch (error) {
+      //@ts-ignore
+      if (error.response && error.response.data) {
+        //@ts-ignore
+        return rejectWithValue(error.response.data);
+      }
+      //@ts-ignore
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = livraisonAdapter.getInitialState({
   loading: false,
+  status : '',
   error: null,
   total: 0,
 });
@@ -166,16 +203,20 @@ const livraisonSlice = createSlice({
       })
       .addCase(addLivraison.pending, (state) => {
         state.loading = true;
+        state.status = 'pending'
         state.error = null;
       })
       .addCase(addLivraison.fulfilled, (state, action) => {
         state.loading = false;
+        state.status = 'fulfilled'
         livraisonAdapter.addOne(state, action.payload);
       })
       .addCase(addLivraison.rejected, (state, action) => {
           //@ts-ignore
         state.loading = false;
           //@ts-ignore
+          state.status = 'failed'
+           //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(updateLivraison.pending, (state) => {
@@ -215,6 +256,19 @@ const livraisonSlice = createSlice({
         state.loading = false;
           //@ts-ignore
         state.error = action.payload;
+      })
+      .addCase(fetchExcludedLivraisons.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchExcludedLivraisons.fulfilled, (state, action) => {
+        state.loading = false;
+        livraisonAdapter.setAll(state,action.payload) 
+      })
+      .addCase(fetchExcludedLivraisons.rejected, (state, action) => {
+        state.loading = false;
+         //@ts-ignore
+        state.error = action.payload as string;
       })
       .addCase(searchLivraisonsByProduit.pending, (state) => {
         state.loading = true;
@@ -262,6 +316,25 @@ const livraisonSlice = createSlice({
         state.loading = false;
           //@ts-ignore
         state.error = action.error.message;
+      })
+      .addCase(updateLivraisonStatut.pending, (state) => {
+        state.status = 'loading';
+      })
+      // Mise à jour du statut - fulfilled
+      .addCase(updateLivraisonStatut.fulfilled, (state, action) => {
+        const { id, statut } = action.payload;
+
+        // Mettre à jour le statut de la livraison dans l'état
+        livraisonAdapter.updateOne(state, {
+          id,
+          changes: { statut }
+        });
+      })
+      // Mise à jour du statut - rejected
+      .addCase(updateLivraisonStatut.rejected, (state, action) => {
+        state.status = 'failed';
+        //@ts-ignore
+        state.error = action.payload;
       });
   },
 });

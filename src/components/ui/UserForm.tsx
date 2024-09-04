@@ -24,7 +24,7 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
   const dispatch: AppDispatch = useDispatch();
 
   return (
-    <><CardHeader subheader="The information can be edited" title="Profile" /><Divider /><Formik
+    <><CardHeader subheader="The information can be edited" title="Profile" className='bg-gray-50'/><Divider /><Formik
           initialValues={{
               nom: user.nom,
               postnom: user.postnom,

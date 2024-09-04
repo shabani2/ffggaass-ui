@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, TextField, Select, MenuItem, FormControl, InputLabel, Grid, CircularProgress, Button, Modal, Typography, IconButton } from '@mui/material';
+import { Box, TextField, Select, MenuItem, FormControl, InputLabel, Grid, CircularProgress, Modal, Typography, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { AppDispatch, RootState } from '@/Redux/Store';
@@ -14,7 +14,9 @@ import { addVente } from '@/Redux/Admin/venteSlice';
 import {jsPDF} from 'jspdf';  // Import jsPDF
 import 'jspdf-autotable';
 //import { DownloadIcon } from 'lucide-react';
-import {Download as DownloadIcon, Cancel as CancelIcon} from '@mui/icons-material';
+import {Download as DownloadIcon} from '@mui/icons-material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -45,13 +47,19 @@ const CaisseVendeur: React.FC = () => {
   const user = useSelector(selectCurrentUser);
 
   const [products, setProducts] = useState<Vente[]>([]);
-
+  const addStatus = useSelector((state: RootState) => state.vente.status);
  
 
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchProduits());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (addStatus === 'failed') {
+      toast.error(`Erreur: la quantite en stock est inferieur pour accepter cette operation`);
+    }
+  }, [addStatus]);
 
   const formik = useFormik({
     initialValues: {
@@ -127,11 +135,14 @@ const CaisseVendeur: React.FC = () => {
       console.log('Form Submitted', client);
       for (const p of products) {
         await dispatch(addVente(p)); // Ajoutez des ventes une par une
-      }
-      
+        if(addStatus=='fulfilled'){
+          toast.success('Vente effectuee avec succes');
+        }
+        
+      }     
      
       setProducts([]);
-      setModalOpen(true)
+      //setModalOpen(true)
     } finally {
       setLoading(false); // Terminez le chargement
     }
@@ -485,7 +496,17 @@ const CaisseVendeur: React.FC = () => {
             
     </div>
    
-
+    <ToastContainer 
+       position="top-center"
+       autoClose={5000}
+       hideProgressBar={false}
+       newestOnTop={false}
+       closeOnClick
+       rtl={false}
+       pauseOnFocusLoss
+       draggable
+       pauseOnHover
+      />
     </>
     
   );

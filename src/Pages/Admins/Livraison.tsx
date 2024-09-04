@@ -1,21 +1,35 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Chip, IconButton, Stack, Typography, Modal, TextField, MenuItem, Grid } from '@mui/material';
+import { Box, Button, Chip, Stack, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
-import { fetchLivraisons, selectAllLivraisons } from '@/Redux/Admin/livraisonSlice';
-import { fetchCategories } from '@/Redux/Admin/categorySlice';
+import { addLivraison, fetchExcludedLivraisons, fetchLivraisons, selectAllLivraisons } from '@/Redux/Admin/livraisonSlice';
+import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice';
 import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
-import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
-import { selectCurrentUser } from '@/Redux/Auth/userSlice';
-import { Download as DownloadIcon, Upload as UploadIcon, Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { fetchProduits, Produit1, selectAllProduits } from '@/Redux/Admin/productSlice';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Download as DownloadIcon, Upload as UploadIcon } from '@mui/icons-material';
 import { format } from 'date-fns';
-import { PointVente1, Livraison } from '@/Utils/dataTypes';
+import { Livraison, PointVente1 } from '@/Utils/dataTypes';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { fetchPointVentes, selectAllPointVentes } from '@/Redux/Admin/pointVenteSlice';
+import { selectCurrentUser } from '@/Redux/Auth/userSlice';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+const validationSchema = yup.object({
+  quantite: yup.number().required('Quantite is required').min(1, 'Quantite must be at least 1'),
+  montant: yup.number().required('Montant is required').min(1, 'Montant must be at least 1'),
+  produit: yup.string().required('Produit is required'),
+  category: yup.string().required('Category is required'),
+});
 
 const LivraisonPage = () => {
   const dispatch: AppDispatch = useDispatch();
   const livraisons = useSelector(selectAllLivraisons);  
-  const user = useSelector(selectCurrentUser);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const loading = useSelector((state: RootState) => state.livraison.loading);
   const error = useSelector((state: RootState) => state.livraison.error);
@@ -23,20 +37,60 @@ const LivraisonPage = () => {
   const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null);
-  const [categories, setCategories] = useState<{ _id: string; nom: string }[]>([]);
-  const [produits, setProduits] = useState<Produit1[]>([]);
-  const [pointVente, setPointVente] = useState<PointVente1 | null>(null);
-  const [category, setCategory] = useState<string>('');
-  const [produit, setProduit] = useState<string>('');
-  const [prix, setPrix] = useState<number | string>('');
-  const [quantite, setQuantite] = useState<number | string>('');
-  const [montant, setMontant] = useState<number | string>('');
+  const produits = useSelector((state: RootState) => selectAllProduits(state));
+  const categories = useSelector((state: RootState) => selectAllCategories(state));
+  const pointventes = useSelector((state: RootState) => selectAllPointVentes(state));
+  const [selectedProduit, setSelectedProduit] = useState<Produit1 | null>(null);
+  const [filteredProduits, setFilteredProduits] = useState<Produit1[]>([]);
+  const user = useSelector(selectCurrentUser)
+  const addStatus = useSelector((state: RootState) => state.livraison.status);
+  
 
+  const formik = useFormik({
+    initialValues: {
+      quantite: 0,
+      montant: 0,
+      produit: '',
+      category: '',
+      prix: 0,
+      pointvente:''
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values,{resetForm}) => {
+      const livraisonData = { ...values, produit: selectedProduit };
+      const data = {        
+        quantite:livraisonData.quantite,
+        montant:livraisonData.montant ,
+        produit:livraisonData?.produit,
+        pointVente:livraisonData.pointvente
+        }
+     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+     //@ts-ignore     
+      
+      dispatch(addLivraison(data)).then((rep)=>{
+        dispatch(fetchExcludedLivraisons(user?.pointVente?.nom)).then((rep)=>{
+          console.log('rep',rep.payload)
+        });  
+        
+        console.log('data==> : ', rep);
+      });
+      
+      resetForm();
+      handleCloseModal()
+    },
+  });
+  
   useEffect(() => {
-    dispatch(fetchLivraisons());
-    dispatch(fetchCategories()).then((res) => setCategories(res.payload));
-    dispatch(fetchProduits()).then((res) => setProduits(res.payload));
+    dispatch(fetchCategories());
+    dispatch(fetchProduits());
+    dispatch(fetchPointVentes())
+  }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchExcludedLivraisons(user?.pointVente?.nom)).then((rep)=>{
+      console.log('rep',rep.payload)
+    });    
   }, [dispatch]);
 
   const columns: GridColDef[] = [
@@ -48,9 +102,9 @@ const LivraisonPage = () => {
         const startIndex = paginationModel.page * paginationModel.pageSize;
         return startIndex + params.api.getSortedRowIds().indexOf(params.id) + 1;
       },
-    },
-    { field: 'produit', headerName: 'Produit', width: 100, valueGetter: (params) => params?.nom },
-    { field: 'pointVente', headerName: 'Point de Vente', width: 150, valueGetter: (params) => params?.nom },
+    },    
+    { field: 'pointVente', headerName: 'Point de Vente', width: 150, valueGetter: (params:PointVente1) => params.nom },
+    { field: 'produit', headerName: 'Produit', width: 100, valueGetter: (params:Produit1) => params.nom },
     { field: 'quantite', headerName: 'Quantité', width: 100 },
     { field: 'montant', headerName: 'Montant', width: 150 },
     {
@@ -68,26 +122,33 @@ const LivraisonPage = () => {
       width: 200,
       renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      renderCell: (params) => (
-        <>
-          <IconButton color="primary" onClick={() => handleOpenModal('edit', params.row as Livraison)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton color="secondary" onClick={() => handleDelete(params.row.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </>
-      ),
-    },
+    // {
+    //   field: 'actions',
+    //   headerName: 'Actions',
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <>
+    //       <IconButton color="primary" onClick={() => handleOpenModal('edit', params.row as Livraison)}>
+    //         <EditIcon />
+    //       </IconButton>
+    //       <IconButton color="secondary" onClick={() => handleDelete(params.row.id)}>
+    //         <DeleteIcon />
+    //       </IconButton>
+    //     </>
+    //   ),
+    // },
   ];
+  //console.log('user pv name',user?.pointVente?.nom)
 
-  const handleDelete = (id: string) => {
-    console.log('Delete ID:', id);
-  };
+  // const handleDelete = (id: string) => {
+  //   dispatch(deleteLivraison((id))).then(()=>{
+  //    // dispatch(fetchLivraisons())
+  //   // console.log('rep',rep.payload)
+  //     dispatch(fetchCategories());
+  //     dispatch(fetchProduits());
+  //     dispatch(fetchPointVentes())
+  //   })
+  // };
 
   const handleUploadClick = () => {
     if (inputRef.current) {
@@ -125,14 +186,42 @@ const LivraisonPage = () => {
   };
 
   const handleCloseModal = () => {
+    
     setIsModalOpen(false);
     setSelectedDelivery(null);
   };
+  
+  useEffect(() => {
+    if (addStatus === 'failed') {
+      toast.error(`Erreur: la quantite en stock est inferieur pour accepter cette operation`);
+    }
+  }, [addStatus, error]);
 
-  const handleSave = () => {
-    // Handle save logic here
-    handleCloseModal();
+
+  const handleCategoryChange = (event: { target: { value: any } }) => {
+    const categoryId = event.target.value as string;
+    formik.setFieldValue('category', categoryId);
+    setFilteredProduits(produits.filter((produit: Produit1) => produit.category._id === categoryId));
+    formik.setFieldValue('produit', '');
+    formik.setFieldValue('prix', 0);
+    formik.setFieldValue('quantite',0)
   };
+
+  const handleProduitChange = (event: { target: { value: any } }) => {
+    const produitId = event.target.value as string;
+    const selected = produits.find((produit) => produit?._id === produitId);
+    setSelectedProduit(selected || null);
+    formik.setFieldValue('produit', produitId);
+    formik.setFieldValue('prix', selected?.prix);
+    
+  };
+
+  useEffect(() => {
+    const montant = formik.values.quantite * formik.values.prix;
+    formik.setFieldValue('montant', montant);
+  }, [formik.values.quantite, formik.values.prix]);  
+
+  
 
   return (
     <div className='w-full h-screen p-8 bg-gray-200'>
@@ -173,9 +262,9 @@ const LivraisonPage = () => {
           </Button>
         </div>
 
-        {livraisons.filter((liv) => liv.pointVente._id !== user?.pointVente?._id).length > 0 ? (
+        {livraisons.length > 0 ? (
           <DataGrid
-            rows={livraisons.filter((liv) => liv.pointVente._id !== user?.pointVente?._id)}
+            rows={livraisons}
             columns={columns}
             pagination
             paginationMode="client"
@@ -186,6 +275,7 @@ const LivraisonPage = () => {
             onRowSelectionModelChange={(newSelection) => setSelectionModel(newSelection)}
             rowSelectionModel={selectionModel}
             paginationModel={paginationModel}
+            getRowId={(row) => row._id}
           />
         ) : (
           <div>No content</div>
@@ -210,85 +300,234 @@ const LivraisonPage = () => {
             width: '90%',
             maxWidth: '700px',
           }}
+          component='form' onSubmit={formik.handleSubmit}
         >
           <Typography variant="h6" component="h2" className="mb-4">
             {modalMode === 'create' ? 'Nouvelle Livraison' : 'Modifier Livraison'}
           </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
+          {/* <Grid container spacing={2}>
+            
+                <Grid item xs={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Point de vente</InputLabel>
+                    <Select
+                      name="pointvente"
+                      value={formik.values.pointvente}
+                      onChange={formik.handleChange}
+                      error={formik.touched.pointvente && Boolean(formik.errors.pointvente)}
+                    >
+                      {pointventes.map((pv) => (
+                        <MenuItem key={pv.id} value={pv.id}>
+                          {pv.nom}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                      name="category"
+                      value={formik.values.category}
+                      onChange={handleCategoryChange}
+                      error={formik.touched.category && Boolean(formik.errors.category)}
+                    >
+                      {categories.map((category) => (
+                        <MenuItem key={category.id} value={category.id}>
+                          {category.nom}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Produit</InputLabel>
+                    <Select
+                      name="produit"
+                      value={formik.values.produit}
+                      onChange={handleProduitChange}
+                      error={formik.touched.produit && Boolean(formik.errors.produit)}
+                    >
+                      {filteredProduits.map((produit) => (
+                        <MenuItem key={produit.id} value={produit.id}>
+                          {produit.nom}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    id="prix"
+                    name="prix"
+                    label="Prix"
+                    type="number"
+                    disabled
+                    value={formik.values.prix}
+                    onChange={formik.handleChange}
+                    error={formik.touched.prix && Boolean(formik.errors.prix)}
+                    helperText={formik.touched.prix && formik.errors.prix}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    id="quantite"
+                    name="quantite"
+                    label="Quantite"
+                    type="number"
+                    value={formik.values.quantite}
+                    onChange={formik.handleChange}
+                    error={formik.touched.quantite && Boolean(formik.errors.quantite)}
+                    helperText={formik.touched.quantite && formik.errors.quantite}
+                  />
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    disabled
+                    id="montant"
+                    name="montant"
+                    label="Montant"
+                    type="number"
+                    value={formik.values.montant}
+                    onChange={formik.handleChange}
+                    error={formik.touched.montant && Boolean(formik.errors.montant)}
+                    helperText={formik.touched.montant && formik.errors.montant}
+                  />
+                </Grid>
+          </Grid> */}
+          <div className="flex flex-wrap -mx-3">
+            <div className="w-full px-3 mb-6 md:w-1/3">
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Point de vente</InputLabel>
+                <Select
+                  name="pointvente"
+                  value={formik.values.pointvente}
+                  onChange={formik.handleChange}
+                  error={formik.touched.pointvente && Boolean(formik.errors.pointvente)}
+                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                >
+                  {pointventes.map((pv) => (
+                    <MenuItem key={pv.id} value={pv.id}>
+                      {pv.nom}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Category</InputLabel>
+                <Select
+                  name="category"
+                  value={formik.values.category}
+                  onChange={handleCategoryChange}
+                  error={formik.touched.category && Boolean(formik.errors.category)}
+                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                >
+                  {categories.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.nom}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Produit</InputLabel>
+                <Select
+                  name="produit"
+                  value={formik.values.produit}
+                  onChange={handleProduitChange}
+                  error={formik.touched.produit && Boolean(formik.errors.produit)}
+                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                >
+                  {filteredProduits.map((produit) => (
+                    <MenuItem key={produit.id} value={produit.id}>
+                      {produit.nom}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
               <TextField
                 fullWidth
-                select
-                label="Point de Vente"
-                value={pointVente?._id || ''}
-                onChange={(e) => setPointVente(e.target.value)}
-              >
-                <MenuItem value="1">Point de Vente 1</MenuItem>
-                <MenuItem value="2">Point de Vente 2</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Catégorie"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {categories.map((cat) => (
-                  <MenuItem key={cat._id} value={cat._id}>
-                    {cat.nom}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Produit"
-                value={produit}
-                onChange={(e) => setProduit(e.target.value)}
-              >
-                {produits.map((prod) => (
-                  <MenuItem key={prod._id} value={prod._id}>
-                    {prod.nom}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                type="number"
+                margin="normal"
+                id="prix"
+                name="prix"
                 label="Prix"
-                value={prix}
-                onChange={(e) => setPrix(e.target.value)}
+                type="number"
+                value={formik.values.prix}
+                onChange={formik.handleChange}
+                error={formik.touched.prix && Boolean(formik.errors.prix)}
+                helperText={formik.touched.prix && formik.errors.prix}
+                InputProps={{
+                  readOnly: true,
+                  className: "bg-gray-100 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500",
+                }}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
               <TextField
                 fullWidth
-                type="number"
+                margin="normal"
+                id="quantite"
+                name="quantite"
                 label="Quantité"
-                value={quantite}
-                onChange={(e) => setQuantite(e.target.value)}
+                type="number"
+                value={formik.values.quantite}
+                onChange={formik.handleChange}
+                error={formik.touched.quantite && Boolean(formik.errors.quantite)}
+                helperText={formik.touched.quantite && formik.errors.quantite}
+                InputProps={{
+                  className: "bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500",
+                }}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
               <TextField
                 fullWidth
-                type="number"
+                margin="normal"
+                id="montant"
+                name="montant"
                 label="Montant"
-                value={montant}
-                onChange={(e) => setMontant(e.target.value)}
-                disabled
+                type="number"
+                value={formik.values.montant}
+                onChange={formik.handleChange}
+                error={formik.touched.montant && Boolean(formik.errors.montant)}
+                helperText={formik.touched.montant && formik.errors.montant}
+                InputProps={{
+                  readOnly: true,
+                  className: "bg-gray-100 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500",
+                }}
               />
-            </Grid>
-          </Grid>
+            </div>
+          </div>
           <Box className="flex justify-end mt-4">
             <button 
-            onClick={handleSave}
+           // onClick={handleSave}
+           type='submit'
             className="px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
             >
               {modalMode === 'create' ? 'Créer' : 'Modifier'}
@@ -301,6 +540,17 @@ const LivraisonPage = () => {
           </Box>
         </Box>
       </Modal>
+      <ToastContainer 
+       position="top-center"
+       autoClose={5000}
+       hideProgressBar={false}
+       newestOnTop={false}
+       closeOnClick
+       rtl={false}
+       pauseOnFocusLoss
+       draggable
+       pauseOnHover
+      />
     </div>
   );
 };

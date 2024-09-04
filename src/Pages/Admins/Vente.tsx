@@ -16,6 +16,7 @@ import { EntityId } from '@reduxjs/toolkit';
 import { CheckCircleIcon, DownloadIcon, UploadIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import Chip from '@mui/material/Chip';
+import { selectAllVentes } from '@/Redux/Admin/venteSlice';
 
 const style = {
   position: 'absolute' as const,
@@ -41,7 +42,8 @@ const validationSchema = yup.object({
 
 const Vente: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
-  const mvtStocks = useSelector((state: RootState) => selectAllMvtStocks(state));
+  //const mvtStocks = useSelector((state: RootState) => selectAllMvtStocks(state));
+ const ventes = useSelector((state:RootState)=>selectAllVentes(state))
   const totalRows = useSelector((state: RootState) => selectTotalMvtStocks(state));
   const produits = useSelector((state: RootState) => selectAllProduits(state));
   const categories = useSelector((state: RootState) => selectAllCategories(state));
@@ -56,8 +58,7 @@ const Vente: React.FC = () => {
   const [loading1, setLoading1] = useState(false);
 
   useEffect(() => {
-    setLoading1(true);
-    dispatch(fetchMvtStocks());
+    setLoading1(true);    
     dispatch(fetchProduits());
     dispatch(fetchCategories());
   }, [page, dispatch]);
@@ -121,6 +122,27 @@ const Vente: React.FC = () => {
     formik.resetForm();
     setModalOpen(true);
   };
+
+  const handleCategoryChange = (event: { target: { value: any } }) => {
+    const categoryId = event.target.value as string;
+    formik.setFieldValue('category', categoryId);
+    setFilteredProduits(produits.filter((produit: Produit1) => produit.category._id === categoryId));
+    formik.setFieldValue('produit', '');
+    formik.setFieldValue('prix', 0);
+  };
+
+  const handleProduitChange = (event: { target: { value: any } }) => {
+    const produitId = event.target.value as string;
+    const selected = produits.find((produit) => produit?._id === produitId);
+    setSelectedProduit(selected || null);
+    formik.setFieldValue('produit', produitId);
+    formik.setFieldValue('prix', selected?.prixVente);
+  };
+
+  useEffect(() => {
+    const montant = formik.values.quantite * formik.values.prix;
+    formik.setFieldValue('montant', montant);
+  }, [formik.values.quantite, formik.values.prix]);  
 
   const columns: GridColDef[] = [
     { field: 'operation', headerName: 'Operation', width: 130 },
@@ -250,17 +272,20 @@ const Vente: React.FC = () => {
         
         <Box >
         <Typography className='text-blue-500' sx={{fontSize:'2em',margin:'3 0'}}>Tableau de bon de livraisons</Typography>
-          {mvtStocks.length>0 ?
+          {ventes.length>0 ?
           <DataGrid
-            rows={mvtStocks}
-            columns={columns}
-            pageSize={20}
-            loading={loading}
-            checkboxSelection
-            onSelectionModelChange={(newSelection: React.SetStateAction<GridRowSelectionModel>) => {
-              setSelectionModel(newSelection);
-            }}
-            selectionModel={selectionModel}           
+          rows={ventes}
+          columns={columns}
+          pagination
+          paginationMode="client"
+          rowCount={ventes.length}
+         // onPaginationModelChange={(newPaginationModel) => setPaginationModel(newPaginationModel)}
+          loading={loading}
+          checkboxSelection
+          onRowSelectionModelChange={(newSelection) => setSelectionModel(newSelection)}
+          rowSelectionModel={selectionModel}
+        //  paginationModel={paginationModel}
+          getRowId={(row) => row._id}          
           />
           :
           <div>no content</div>}
@@ -274,20 +299,7 @@ const Vente: React.FC = () => {
         >
           <Box sx={style}>
             <h2 id="modal-modal-title">MvtStock</h2>
-            <form onSubmit={formik.handleSubmit}>
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Operation</InputLabel>
-                <Select
-                  name="operation"
-                  value={formik.values.operation}
-                  onChange={formik.handleChange}
-                  error={formik.touched.operation && Boolean(formik.errors.operation)}
-                  fullWidth
-                >
-                  <MenuItem value="vente">Vente</MenuItem>
-                  <MenuItem value="livraison">Livraison</MenuItem>
-                </Select>
-              </FormControl>
+            <form onSubmit={formik.handleSubmit}>             
               <TextField
                 fullWidth
                 margin="normal"
@@ -312,19 +324,7 @@ const Vente: React.FC = () => {
                 error={formik.touched.montant && Boolean(formik.errors.montant)}
                 helperText={formik.touched.montant && formik.errors.montant}
               />
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Statut</InputLabel>
-                <Select
-                  name="statut"
-                  value={formik.values.statut}
-                  onChange={formik.handleChange}
-                  error={formik.touched.statut && Boolean(formik.errors.statut)}
-                  fullWidth
-                >
-                  <MenuItem value="validate">Validate</MenuItem>
-                  <MenuItem value="unvalidate">Unvalidate</MenuItem>
-                </Select>
-              </FormControl>
+             
               <FormControl fullWidth margin="normal">
                 <InputLabel>Produit</InputLabel>
                 <Select

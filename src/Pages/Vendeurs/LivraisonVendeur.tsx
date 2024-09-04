@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
  
   searchLivraisonsByPointVente, 
-  selectAllLivraisons 
+  selectAllLivraisons, 
+  updateLivraisonStatut
 } from '@/Redux/Admin/livraisonSlice';
-import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, IconButton, Radio, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,42 +68,71 @@ const LivraisonVendeur = () => {
       width: 150,
       renderCell: (params) => {
         const statut = params.value as string;
+        return <Chip color={statut === 'unvalidate' ? 'error' : 'success'} label={statut} size="small" />;
+      },
+    },
+    {
+      field: '',
+      headerName: 'Valider',
+      width: 150,
+      renderCell: (params) => {
+        const statut = params.row.statut as string;
+        const livraisonId = params.row._id; // Assurez-vous que l'ID de la livraison est présent dans `params.row`
+          console.log('staut',statut)
+        const handleChange = () => {
+          
+          if (statut !== 'validate') {
+            const newStatut = 'validate';
+            // Appel du thunk pour mettre à jour le statut
+            dispatch(updateLivraisonStatut({ id: livraisonId, statut: newStatut })).then(() => {
+              user && dispatch(searchLivraisonsByPointVente(user?.pointVente?.nom));
+            });
+          }
+        };
+    
         return (
-          <Chip
-            color={statut === 'unvalidate' ? 'error' : 'success'}
-            label={statut}
-            size="small"
+          <Radio
+            checked={statut === 'validate'}
+            onChange={handleChange}
+            disabled={statut === 'validate'}
+            sx={{
+              color: statut === 'validate' ? 'red' : 'blue', // Couleur rouge si "validate", sinon bleue
+              '&.Mui-checked': {
+                color: 'red', // Couleur rouge lorsque coché
+              },
+            }}
           />
         );
       },
     },
+    
     {
       field: 'createdAt',
       headerName: "Date d'opération",
       width: 200,
       renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      renderCell: (params) => (
-        <>
-          <IconButton
-            color="primary"
-            // onClick={() => handleEditClick(params.row as MvtStock)}
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            color="secondary"
-            onClick={() => handleDelete(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </>
-      ),
-    },
+    // {
+    //   field: 'actions',
+    //   headerName: 'Actions',
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <>
+    //       <IconButton
+    //         color="primary"
+    //         // onClick={() => handleEditClick(params.row as MvtStock)}
+    //       >
+    //         <EditIcon />
+    //       </IconButton>
+    //       <IconButton
+    //         color="secondary"
+    //         onClick={() => handleDelete(params.row.id)}
+    //       >
+    //         <DeleteIcon />
+    //       </IconButton>
+    //     </>
+    //   ),
+    // },
   ];
   
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

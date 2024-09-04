@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import { Button, Modal, Box, TextField, Typography, Stack } from '@mui/material';
+import { Button, Modal, Box, TextField, Typography, Stack, IconButton } from '@mui/material';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import {
   fetchClients,
@@ -14,7 +14,9 @@ import {
 import { Client } from '@/Utils/dataTypes';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { UploadIcon, DownloadIcon } from 'lucide-react';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { DownloadIcon, UploadIcon } from 'lucide-react';
+
 
 
 const style = {
@@ -65,6 +67,7 @@ const ClientPage = () => {
    
 
   const handleDeleteClient = (id: string) => {
+    console.log('id client => ',id)
     dispatch(deleteClient(id));
   };
 
@@ -104,12 +107,21 @@ const ClientPage = () => {
       field: 'actions',
       headerName: 'Actions',
       width: 150,
-      renderCell: (params) => (
+      renderCell: (params) => {
+        
+        const row = params.row as Client
+        return (
         <>
-          <Button onClick={() => { setSelectedClient(params.row); handleOpen(); }}>Edit</Button>
-          <Button color="error" onClick={() => handleDeleteClient(params.row.id)}>Delete</Button>
-        </>
-      ),
+          <IconButton onClick={() => { setSelectedClient(row); handleOpen(); }}>
+              <EditIcon color="primary" />
+            </IconButton>
+            <IconButton onClick={() => handleDeleteClient(row._id)}>
+              <DeleteIcon color="error" />
+            </IconButton>
+          
+          
+        </>)
+      },
     },
   ];
 

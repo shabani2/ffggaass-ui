@@ -63,7 +63,7 @@ const Profile = () => {
          </Card>
         </Grid>
 
-        <Grid lg={8} md={6} xs={12} className='bg-gray-100 rounded shadow-lg h-40b-lg' >
+        <Grid lg={8} md={6} xs={12} className='rounded shadow-lg bg-gray-50 h-40b-lg' >
           <UserForm user={user}/>
         </Grid>
       </Grid>

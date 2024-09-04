@@ -15,6 +15,8 @@ import {jsPDF} from 'jspdf';  // Import jsPDF
 import 'jspdf-autotable';
 //import { DownloadIcon } from 'lucide-react';
 import {Download as DownloadIcon} from '@mui/icons-material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -31,7 +33,7 @@ const validationClientSchema = yup.object({
   adresse:yup.string().required('adresse is required'),
 });
 
-const CaisseVendeur: React.FC = () => {
+const Caisse: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
   const produits = useSelector((state: RootState) => selectAllProduits(state));
   const categories = useSelector((state: RootState) => selectAllCategories(state));
@@ -45,13 +47,19 @@ const CaisseVendeur: React.FC = () => {
   const user = useSelector(selectCurrentUser);
 
   const [products, setProducts] = useState<Vente[]>([]);
-
+  const addStatus = useSelector((state: RootState) => state.vente.status);
  
 
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchProduits());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (addStatus === 'failed') {
+      toast.error(`Erreur: la quantite en stock est inferieur pour accepter cette operation`);
+    }
+  }, [addStatus]);
 
   const formik = useFormik({
     initialValues: {
@@ -127,11 +135,14 @@ const CaisseVendeur: React.FC = () => {
       console.log('Form Submitted', client);
       for (const p of products) {
         await dispatch(addVente(p)); // Ajoutez des ventes une par une
-      }
-      
+        if(addStatus=='fulfilled'){
+          toast.success('Vente effectuee avec succes');
+        }
+        
+      }     
      
       setProducts([]);
-      setModalOpen(true)
+      //setModalOpen(true)
     } finally {
       setLoading(false); // Terminez le chargement
     }
@@ -485,11 +496,21 @@ const CaisseVendeur: React.FC = () => {
             
     </div>
    
-
+    <ToastContainer 
+       position="top-center"
+       autoClose={5000}
+       hideProgressBar={false}
+       newestOnTop={false}
+       closeOnClick
+       rtl={false}
+       pauseOnFocusLoss
+       draggable
+       pauseOnHover
+      />
     </>
     
   );
 };
 
 
-export default CaisseVendeur
+export default Caisse

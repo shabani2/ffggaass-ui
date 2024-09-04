@@ -1,19 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Produit, PointVente1, Livraison } from '@/Utils/dataTypes';
+import { Produit, PointVente1, Livraison, Vente } from '@/Utils/dataTypes';
 import {  DownloadIcon, UploadIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { selectCurrentUser } from '@/Redux/Auth/userSlice';
 import { fetchCategories } from '@/Redux/Admin/categorySlice';
 import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
-import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
+import { fetchProduits } from '@/Redux/Admin/productSlice';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { fetchVentesByPointVente, searchVentes, selectAllVentes } from '@/Redux/Admin/venteSlice';
+
+
 
 
 const VentePage = () => {
@@ -28,8 +31,7 @@ const VentePage = () => {
     pageSize: 10,
     page: 0,
   });
-
-  
+ 
 
   useEffect(() => {
     console.log('pvname=>',user?.pointVente?.nom)
@@ -43,14 +45,14 @@ const VentePage = () => {
       width: 70,
       renderCell: (params) => {
         const startIndex = paginationModel.page * paginationModel.pageSize;
-      return startIndex + params.api.getSortedRowIds().indexOf(params.id) + 1;
+        return startIndex + params.api.getSortedRowIds().indexOf(params.id) + 1;
       },
     },
     {
       field: 'produit',
       headerName: 'Produit',
       width: 100,
-      valueGetter: (params: Produit1) => params?.nom,
+      valueGetter: (params: Produit) => params?.nom,
     },
     {
       field: 'pointVente',
@@ -59,8 +61,56 @@ const VentePage = () => {
       valueGetter: (params: PointVente1) => params?.nom,
     },
     { field: 'quantite', headerName: 'Quantité', width: 100 },
-    { field: 'montant', headerName: 'Montant', width: 150 },
     
+    // Nouvelle colonne "Coût d'achat" avec couleur bleue
+    {
+      field: 'coutAchat',
+      headerName: 'Coût d\'achat',
+      width: 150,
+      renderCell: (params) => {
+        const prix = params?.row.produit.prix;
+        const vente = params.row;
+        const coutAchat = prix * vente.quantite;
+  
+        return (
+          <span style={{ color: '#4FC3F7' /* Bleu clair */ }}>
+            {coutAchat}
+          </span>
+        );
+      },
+    },
+  
+    // Colonne "Prix de vente" avec couleur verte
+    { 
+      field: 'montant', 
+      headerName: 'Prix de vente', 
+      width: 150, 
+      renderCell: (params) => (
+        <span style={{ color: '#388E3C' /* Vert foncé */ }}>
+          {params.value}
+        </span>
+      ),
+    },
+  
+    // Colonne "Marge" avec couleur orange
+    {
+      field: 'Marge',
+      headerName: 'Marge',
+      width: 150,
+      renderCell: (params) => {
+        const vente = params.row;
+        const cout = params?.row.produit.prix * vente.quantite;
+        const prixVente = params?.row.produit.prixVente * vente.quantite;
+        const marge = prixVente - cout;
+  
+        return (
+          <span style={{ color: '#FF9800' /* Orange */ }}>
+            {marge}
+          </span>
+        );
+      },
+    },
+  
     {
       field: 'createdAt',
       headerName: "Date d'opération",
@@ -73,16 +123,10 @@ const VentePage = () => {
       width: 100,
       renderCell: (params) => (
         <>
-          <IconButton
-            color="primary"
-            // onClick={() => handleEditClick(params.row as MvtStock)}
-          >
+          <IconButton color="primary">
             <EditIcon />
           </IconButton>
-          <IconButton
-            color="secondary"
-            onClick={() => handleDelete(params.row.id)}
-          >
+          <IconButton color="secondary" onClick={() => handleDelete(params.row.id)}>
             <DeleteIcon />
           </IconButton>
         </>
@@ -90,9 +134,14 @@ const VentePage = () => {
     },
   ];
   
+  
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-expect-error
-  function handleDelete(id) {
+  
+  
+
+  
+  
+  function handleDelete(id: any) {
     console.log('hello',id)
   }
 
@@ -194,8 +243,13 @@ const VentePage = () => {
           :
           <div>no content</div>}
         </Box>
+
+        
        </div>
+       
      </div>
+    
+    
 
 </>
 

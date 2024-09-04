@@ -1,55 +1,48 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
- 
-  searchLivraisonsByPointVente, 
-  selectAllLivraisons 
-} from '@/Redux/Admin/livraisonSlice';
-import { Box, Button, IconButton, Stack, Typography , Modal, TextField, MenuItem, Grid} from '@mui/material';
+import { Box, Button, Stack, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Produit, PointVente1, Livraison } from '@/Utils/dataTypes';
-import {  DownloadIcon, UploadIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { selectCurrentUser } from '@/Redux/Auth/userSlice';
-import { fetchCategories } from '@/Redux/Admin/categorySlice';
+import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice';
 import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
-import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
-//import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { fetchProduits, Produit1, selectAllProduits } from '@/Redux/Admin/productSlice';
+import { Download as DownloadIcon, Upload as UploadIcon } from '@mui/icons-material';
+import { format } from 'date-fns';
+import { Livraison } from '@/Utils/dataTypes';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { addBonEntre, fetchBonsEntres, selectAllBonsEntres } from '@/Redux/Admin/bonEntreSlice';
 
 
+
+const validationSchema = yup.object({
+  quantite: yup.number().required('Quantite is required').min(1, 'Quantite must be at least 1'),
+  montant: yup.number().required('Montant is required').min(1, 'Montant must be at least 1'),
+  produit: yup.string().required('Produit is required'),
+  category: yup.string().required('Category is required'),
+});
 
 const BonEntrePage = () => {
-  const dispatch :AppDispatch= useDispatch();
-  const livraisons = useSelector(selectAllLivraisons);  
-  const user = useSelector(selectCurrentUser);
+  const dispatch: AppDispatch = useDispatch();
+  const entreStock = useSelector((state:RootState)=>selectAllBonsEntres(state))
   const inputRef = useRef<HTMLInputElement | null>(null);
   const loading = useSelector((state: RootState) => state.livraison.loading);
   const error = useSelector((state: RootState) => state.livraison.error);
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
-  const [paginationModel, setPaginationModel] = useState({
-    pageSize: 10,
-    page: 0,
-  });
-
-  const [produits, setProduits] = useState<Produit1[]>([]);
-  const [pointVente, setPointVente] = useState<PointVente1 | null>(null);
-  const [category, setCategory] = useState<string>('');
-  const [produit, setProduit] = useState<string>('');
-  const [prix, setPrix] = useState<number | string>('');
-  const [quantite, setQuantite] = useState<number | string>('');
-  const [montant, setMontant] = useState<number | string>('');
+  const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [categories, setCategories] = useState<{ _id: string; nom: string }[]>([]);
-  const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null);
+  const produits = useSelector((state: RootState) => selectAllProduits(state));
+  const categories = useSelector((state: RootState) => selectAllCategories(state)); 
+  const [selectedProduit, setSelectedProduit] = useState<Produit1 | null>(null);
+  const [filteredProduits, setFilteredProduits] = useState<Produit1[]>([]);
+  //const user = useSelector(selectCurrentUser)
+  
 
-  useEffect(() => {
-    dispatch(searchLivraisonsByPointVente(user?.pointVente?.nom));
-  }, [dispatch]); 
+
+
 
   const columns: GridColDef[] = [
     {
@@ -67,12 +60,7 @@ const BonEntrePage = () => {
       width: 100,
       valueGetter: (params: Produit1) => params?.nom,
     },
-    {
-      field: 'pointVente',
-      headerName: 'Point de Vente',
-      width: 150,
-      valueGetter: (params: PointVente1) => params?.nom,
-    },
+   
     { field: 'quantite', headerName: 'Quantité', width: 100 },
     { field: 'montant', headerName: 'Montant', width: 150 },
     // {
@@ -96,28 +84,63 @@ const BonEntrePage = () => {
       width: 200,
       renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      renderCell: (params) => (
-        <>
-          <IconButton
-            color="primary"
-            // onClick={() => handleEditClick(params.row as MvtStock)}
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            color="secondary"
-            onClick={() => handleDelete(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </>
-      ),
-    },
+    // {
+    //   field: 'actions',
+    //   headerName: 'Actions',
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <>
+    //       <IconButton
+    //         color="primary"
+    //         // onClick={() => handleEditClick(params.row as MvtStock)}
+    //       >
+    //         <EditIcon />
+    //       </IconButton>
+    //       <IconButton
+    //         color="secondary"
+    //         onClick={() => handleDelete(params.row.id)}
+    //       >
+    //         <DeleteIcon />
+    //       </IconButton>
+    //     </>
+    //   ),
+    // },
   ];
+
+  const formik = useFormik({
+    initialValues: {
+      quantite: 0,
+      montant: 0,
+      produit: '',
+      category: '',
+      prix: 0,
+      pointvente:''
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values,{resetForm}) => {
+      const livraisonData = { ...values, produit: selectedProduit };
+      const data = {        
+        quantite:livraisonData.quantite,
+        montant:livraisonData.montant ,
+        produit:livraisonData?.produit,
+        //pointVente:livraisonData.pointvente
+        }
+     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+     //@ts-ignore     
+      
+      dispatch(addBonEntre(data)).then((rep)=>{
+        //fetchLivraisons()
+        dispatch(fetchCategories());
+        dispatch(fetchProduits());
+        dispatch(fetchBonsEntres())
+        
+        console.log('data==> : ', rep);
+      });
+      
+      resetForm();
+      handleCloseModal()
+    },
+  });
   
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-expect-error
@@ -161,14 +184,45 @@ const BonEntrePage = () => {
   };
 
   const handleCloseModal = () => {
+    formik.setFieldValue('produit', '');
+    formik.setFieldValue('prix', 0);
+    formik.setFieldValue('category','')
+    formik.setFieldValue('quantite',0)
     setIsModalOpen(false);
     setSelectedDelivery(null);
   };
 
-  const handleSave = () => {
-    // Handle save logic here
-    handleCloseModal();
+  useEffect(() => {
+    //setLoading1(true);    
+    dispatch(fetchProduits());
+    dispatch(fetchCategories());
+    dispatch(fetchBonsEntres())
+  }, [ dispatch]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCategoryChange = (event: { target: { value: any } }) => {
+    const categoryId = event.target.value as string;
+    formik.setFieldValue('category', categoryId);
+    setFilteredProduits(produits.filter((produit: Produit1) => produit.category._id === categoryId));
+    formik.setFieldValue('produit', '');
+    formik.setFieldValue('prix', 0);
+    // formik.setFieldValue('category','')
+    formik.setFieldValue('quantite',0)
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleProduitChange = (event: { target: { value: any } }) => {
+    const produitId = event.target.value as string;
+    const selected = produits.find((produit) => produit?._id === produitId);
+    setSelectedProduit(selected || null);
+    formik.setFieldValue('produit', produitId);
+    formik.setFieldValue('prix', selected?.prix);
+  };
+
+  useEffect(() => {
+    const montant = formik.values.quantite * formik.values.prix;
+    formik.setFieldValue('montant', montant);
+  }, [formik.values.quantite, formik.values.prix]);  
+  console.log('bon d entre',entreStock)
 
   return (
   <>
@@ -223,13 +277,13 @@ const BonEntrePage = () => {
           </div>
         </div>
               
-          {livraisons.length>0 ?
+          {entreStock.length>0 ?
            <DataGrid
-           rows={livraisons} 
+           rows={entreStock} 
            columns={columns}
            pagination
            paginationMode="client"
-           rowCount={livraisons.length}
+           rowCount={entreStock.length}
            onPaginationModelChange={(newPaginationModel) => setPaginationModel(newPaginationModel)}
            loading={loading}
            checkboxSelection
@@ -238,6 +292,7 @@ const BonEntrePage = () => {
            }}
            rowSelectionModel={selectionModel}
            paginationModel={paginationModel}
+           getRowId={(raw)=>raw._id}
          />
           :
           <div>no content</div>}
@@ -260,85 +315,112 @@ const BonEntrePage = () => {
             width: '90%',
             maxWidth: '700px',
           }}
+          component='form' onSubmit={formik.handleSubmit}
         >
           <Typography variant="h6" component="h2" className="mb-4">
-            {modalMode === 'create' ? 'Bon d\'entree ' : 'Modifier Livraison'}
+            {modalMode === 'create' ? 'Nouvelle Livraison' : 'Modifier Livraison'}
           </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
+         
+          <div className="flex flex-wrap -mx-3">           
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Category</InputLabel>
+                <Select
+                  name="category"
+                  value={formik.values.category}
+                  onChange={handleCategoryChange}
+                  error={formik.touched.category && Boolean(formik.errors.category)}
+                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                >
+                  {categories.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.nom}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Produit</InputLabel>
+                <Select
+                  name="produit"
+                  value={formik.values.produit}
+                  onChange={handleProduitChange}
+                  error={formik.touched.produit && Boolean(formik.errors.produit)}
+                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                >
+                  {filteredProduits.map((produit) => (
+                    <MenuItem key={produit.id} value={produit.id}>
+                      {produit.nom}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
               <TextField
                 fullWidth
-                select
-                label="Point de Vente"
-                value={pointVente?._id || ''}
-                onChange={(e) => setPointVente(e.target.value)}
-              >
-                <MenuItem value="1">Point de Vente 1</MenuItem>
-                <MenuItem value="2">Point de Vente 2</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Catégorie"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {categories.map((cat) => (
-                  <MenuItem key={cat._id} value={cat._id}>
-                    {cat.nom}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Produit"
-                value={produit}
-                onChange={(e) => setProduit(e.target.value)}
-              >
-                {produits.map((prod) => (
-                  <MenuItem key={prod._id} value={prod._id}>
-                    {prod.nom}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                type="number"
+                margin="normal"
+                id="prix"
+                name="prix"
                 label="Prix"
-                value={prix}
-                onChange={(e) => setPrix(e.target.value)}
+                type="number"
+                value={formik.values.prix}
+                onChange={formik.handleChange}
+                error={formik.touched.prix && Boolean(formik.errors.prix)}
+                helperText={formik.touched.prix && formik.errors.prix}
+                InputProps={{
+                  readOnly: true,
+                  className: "bg-gray-100 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500",
+                }}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
               <TextField
                 fullWidth
-                type="number"
+                margin="normal"
+                id="quantite"
+                name="quantite"
                 label="Quantité"
-                value={quantite}
-                onChange={(e) => setQuantite(e.target.value)}
+                type="number"
+                value={formik.values.quantite}
+                onChange={formik.handleChange}
+                error={formik.touched.quantite && Boolean(formik.errors.quantite)}
+                helperText={formik.touched.quantite && formik.errors.quantite}
+                InputProps={{
+                  className: "bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500",
+                }}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </div>
+
+            <div className="w-full px-3 mb-6 md:w-1/3">
               <TextField
                 fullWidth
-                type="number"
+                margin="normal"
+                id="montant"
+                name="montant"
                 label="Montant"
-                value={montant}
-                onChange={(e) => setMontant(e.target.value)}
-                disabled
+                type="number"
+                value={formik.values.montant}
+                onChange={formik.handleChange}
+                error={formik.touched.montant && Boolean(formik.errors.montant)}
+                helperText={formik.touched.montant && formik.errors.montant}
+                InputProps={{
+                  readOnly: true,
+                  className: "bg-gray-100 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500",
+                }}
               />
-            </Grid>
-          </Grid>
+            </div>
+          </div>
           <Box className="flex justify-end mt-4">
             <button 
-            onClick={handleSave}
+           // onClick={handleSave}
+           type='submit'
             className="px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
             >
               {modalMode === 'create' ? 'Créer' : 'Modifier'}
@@ -351,6 +433,8 @@ const BonEntrePage = () => {
           </Box>
         </Box>
       </Modal>
+
+        
        </div>
    </div>
      

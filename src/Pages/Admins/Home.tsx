@@ -1,117 +1,88 @@
 
 
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { selectCurrentUser } from '@/Redux/Auth/userSlice';
-
-import { filterSituationsNotByPointVente, selectAllSituationsLivraison } from '@/Redux/Admin/situationLivraisonSlice';
-import { selectAllSituationsVente,filterSituationsNotBy_PointVente } from '@/Redux/Admin/situationVenteSlice';
-import { addSituationsLivraison, addSituationsVente, selectAllSituations, selectPerfomanceByPointVente, selectPointVenteContribution, selectPointVenteTraffic, selectProductPerformance, selectTotalVentesAndLivraisonsByCurrentMonth, selectTotalVentesAndLivraisonsByLatestDate } from '@/Redux/Global/situationSlice';
-import StackedBarChart from '@/components/chartComponents/admins/StackedBarChart';
-import PointVenteTrafficTable from '@/components/chartComponents/admins/PointVenteTrafficTable';
-import ParetoChart from '@/components/chartComponents/admins/ParetoChart';
-import DonutChart from '@/components/chartComponents/admins/DonutChart';
+import { fetchAllStockVariations, selectMontantsTotal } from '@/Redux/Admin/stockVariationSlice';
+import { AppDispatch } from '@/Redux/Store';
+import ContributionPieChart from '@/components/Charts/amdins/ContributionPieChart';
+import LivraisonBarChart from '@/components/Charts/amdins/LivraisonBarChart';
+import VenteBarChart from '@/components/Charts/amdins/VenteBarChart';
+import StockBarChart from '@/components/Charts/amdins/stockBarChart';
 import InfoCard from '@/components/InfoCard';
+import { useEffect } from 'react';
 import { FaDollarSign, FaMoneyBillWave, FaChartLine } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 
 const Home = () => {
-  const dispatch :AppDispatch= useDispatch();
-  const livraisons = useSelector(selectAllSituationsLivraison);  
-  const user = useSelector(selectCurrentUser);  
-  const ventes= useSelector(selectAllSituationsVente);  
-  const situations = useSelector((state: RootState) => selectAllSituations(state));
-  const performances = useSelector(selectPerfomanceByPointVente);
-  const pointVenteTraffic = useSelector((state: RootState) => selectPointVenteTraffic(state));
-  const productPerformance = useSelector((state: RootState) => selectProductPerformance(state));
-  const pointVenteContributions = useSelector((state: RootState) => selectPointVenteContribution(state));
-const { totalVentes, totalLivraisons, difference } = useSelector(selectTotalVentesAndLivraisonsByLatestDate);
+  const dispatch: AppDispatch = useDispatch();
+// const stockVariation = useSelector((state:RootState)=>selectAllStockVariations(state))
+ // const stockVariationsWithMontants = useSelector(selectStockVariationWithMontants);
+  const { totalMontantLivre, totalMontantVendu, difference } = useSelector(selectMontantsTotal);
+  
 
-
-  useEffect(() => {
-    console.log('pv=>',user?.pointVente)
-    dispatch(filterSituationsNotByPointVente(user?.pointVente?._id)).then(()=>{
-      dispatch(addSituationsLivraison(livraisons));
-    }).then(()=>dispatch(filterSituationsNotBy_PointVente(user?.pointVente?._id)).then(()=>{
-      dispatch(addSituationsVente(ventes));
-     }))
-    
-    
-  }, [dispatch]); 
- useEffect(()=>{
-  dispatch(addSituationsVente(ventes));
-  dispatch(addSituationsLivraison(livraisons));
- })
-
+  useEffect(()=>{
+    dispatch(fetchAllStockVariations())
+   // dispatch(fetchProduits())
+  },[dispatch])
  
-
- 
-
-
-//  console.log('le total de  ventes:', situations.filter((s)=>s.operation=='vente').length);
-console.log('le total de situation:', situations.filter((s)=>s.operation=='livraison').length);
-  console.log('livraison',livraisons.length)
-  console.log('vente',ventes.length)
-  console.log('totaux',{totalLivraisons,totalVentes,difference})
 
   return (
     <>
       <div className="min-h-screen p-[2rem] bg-gray-400">
       <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className=" bg-white rounded shadow h-[150px]">
+        <div className="rounded  shadow-custom-lg  h-[150px]">
             <InfoCard 
             title="Chiffre d'affaires" 
-            icon={<FaDollarSign />} 
-            amount={totalVentes} 
+            icon={<FaDollarSign className='text-green-600'/>} 
+            amount={totalMontantVendu} 
           />     
         </div>
         <div className=" bg-white rounded shadow h-[150px]">
           <InfoCard 
             title="Coût de revient" 
-            icon={<FaMoneyBillWave />} 
-            amount={totalLivraisons} 
+            icon={<FaMoneyBillWave className='text-red-600'/>} 
+            amount={totalMontantLivre} 
           />      
           
         </div>
         <div className=" bg-white rounded shadow h-[150px]">
           <InfoCard 
           title="Marge brute" 
-          icon={<FaChartLine />} 
+          icon={<FaChartLine className='text-blue-600' />} 
           amount={difference} 
         />
         </div>
       </div>
 
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="p-4 bg-white rounded shadow h-[500px]">
-        <ParetoChart data={productPerformance} />
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="p-4 bg-gray-50 rounded shadow h-[500px] ">
+        {/* <VenteBarChart/> */}
+        <h2 className='text-xl text-center text-blue-600'>Situation de stock pour chaque produit</h2>
+        <StockBarChart/>
         </div>
-        <div className="p-4 bg-white rounded shadow h-[500px]">
-        <StackedBarChart data={performances} />
-        </div>
-
-      </div>
-
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2 p-4 bg-white rounded shadow h-[500px] z-50"> 
-        <div className="p-2">
-            <h2 className="text-2xl text-blue-600">Résumé de vente par point de vente</h2>
-          </div>
-          <div className="overflow-auto max-h-[400px] z-10">
-            <PointVenteTrafficTable data={pointVenteTraffic} />
-          </div>
+        <div className="p-4 bg-white rounded shadow h-[500px] col-span-2">
           
-           </div>
-        <div className="p-4 bg-white rounded shadow h-[500px]"> 
-        <DonutChart data={pointVenteContributions} />
+        <LivraisonBarChart/>
         </div>
+
       </div>
-    </div>
+
+
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="p-4 bg-white rounded shadow h-[500px]  col-span-2">
+        <h2 className='text-xl text-center text-blue-600'>Repartition de vente de produits par boutique</h2>
+        <VenteBarChart/>
+        </div>
+        <div className="p-4 bg-white rounded shadow h-[500px] col-span-1">
+        <ContributionPieChart/>
+        </div>
+
+      </div>
+
+  </div>
   </>
     
   )

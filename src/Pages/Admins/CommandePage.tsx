@@ -1,292 +1,261 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Box, Button, Stack, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select, Chip } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
-import { AppDispatch, RootState } from '@/Redux/Store';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { fetchCommandes, deleteCommande, selectAllCommandes } from '@/Redux/Admin/commandeSlice';
-import * as yup from 'yup';
-import { EntityId } from '@reduxjs/toolkit';
-import { DownloadIcon, PlusIcon, UploadIcon } from 'lucide-react';
-import { Client, Commande, Livraison, PointVente1 } from '@/Utils/dataTypes';
-import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
+import { AppDispatch } from '@/Redux/Store';
+import { fetchCommandes, addCommande, deleteCommande, selectAllCommandes } from '@/Redux/Admin/commandeSlice';
+import { fetchProduits, selectAllProduits } from '@/Redux/Admin/productSlice';
+import { fetchClients, selectAllClients } from '@/Redux/Admin/clientSlice';
 import { format } from 'date-fns';
-import { fetchClients } from '@/Redux/Admin/clientSlice';
+import { Commande, Client } from '@/Utils/dataTypes';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { EntityId } from '@reduxjs/toolkit';
+import { Produit } from '@/Utils/dataTypes';
 
-import { Box, Button, IconButton, Stack, Typography , Modal, TextField, MenuItem, Grid,Chip} from '@mui/material';
-
-
-
+// Validation schema for the form
 const validationSchema = yup.object({
+  quantite: yup.number().required('Quantité is required').min(1, 'Quantité must be at least 1'),
+  montant: yup.number().required('Montant is required').min(1, 'Montant must be at least 1'),
   produit: yup.string().required('Produit is required'),
   client: yup.string().required('Client is required'),
-  quantite: yup.number().required('Quantite is required').min(1, 'Quantite must be at least 1'),
-  montant: yup.number().required('Montant is required').min(0, 'Montant must be at least 0'),
 });
 
-const CommandePage: React.FC = () => {
-  const dispatch: AppDispatch = useDispatch<AppDispatch>();
-  const commandes = useSelector((state: RootState) => selectAllCommandes(state));
- 
-  const status = useSelector((state:RootState)=>state.commande.loading)
-  
+const CommandePage = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const commandes = useSelector(selectAllCommandes);
+  const produits = useSelector(selectAllProduits);
+  const clients = useSelector(selectAllClients);
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
-  
-  const [produits, setProduits] = useState<Produit1[]>([]);
-  const [pointVente, setPointVente] = useState<PointVente1 | null>(null);
-  const [category, setCategory] = useState<string>('');
-  const [produit, setProduit] = useState<string>('');
-  const [prix, setPrix] = useState<number | string>('');
-  const [quantite, setQuantite] = useState<number | string>('');
-  const [montant, setMontant] = useState<number | string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [categories, setCategories] = useState<{ _id: string; nom: string }[]>([]);
-  const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null)
-  
-  
+  const [selectedCommande, setSelectedCommande] = useState<Commande | null>(null);
+  const [filteredProduits, setFilteredProduits] = useState<Produit[]>([]);
+  const [selectedProduit, setSelectedProduit] = useState<Produit| null>(null);
+  const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
+
+  // Initialize formik with initial values and validation schema
+  const formik = useFormik({
+    initialValues: {
+      quantite: 0,
+      montant: 0,
+      produit: '',
+      client: '',
+      prix: 0,
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values, { resetForm }) => {
+      const commandeData = {
+        ...values,
+        produit: selectedProduit,
+        client: values.client,
+      };
+      dispatch(addCommande(commandeData));
+      dispatch(fetchCommandes());
+      resetForm();
+      handleCloseModal();
+    },
+  });
+
   useEffect(() => {
     dispatch(fetchCommandes());
-    dispatch(fetchProduits())
-    dispatch(fetchClients())
-    // Dispatch actions to fetch products and clients if necessary
-  }, [dispatch]);  
-
-
-
- 
-
-  const handleDelete = (id: EntityId) => {
-    dispatch(deleteCommande(id as string)).then(() => {
-      dispatch(fetchCommandes());
-    });
-  };
-
-
+    dispatch(fetchProduits());
+    dispatch(fetchClients());
+  }, [dispatch]);
 
   const columns: GridColDef[] = [
     {
-      field: 'createdAt',
-      headerName: 'Date ',
-      width: 200,
-      renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
-    },
-    { field: 'produit',
-       headerName: 'Produit', 
-       width: 200,
-       valueGetter: (params : Produit1) => params?.nom,
-       },
-    { field: 'client',
-       headerName: 'Client', 
-       width: 250 ,
-       valueGetter: (params : Client) => params?.nom+ ' '+params.postnom+' '+params.prenom,
+      field: 'numéro',
+      headerName: 'N°',
+      width: 70,
+      renderCell: (params) => {
+        const startIndex = paginationModel.page * paginationModel.pageSize;
+        return startIndex + params.api.getSortedRowIds().indexOf(params.id) + 1;
       },
+    },
+    { field: 'client', headerName: 'Client', width: 150, valueGetter: (params: Client) => params.nom },
+    { field: 'produit', headerName: 'Produit', width: 150, valueGetter: (params: Produit1) => params.nom },
     { field: 'quantite', headerName: 'Quantité', width: 100 },
-    { field: 'montant', headerName: 'Montant', width: 100 },
+    { field: 'montant', headerName: 'Montant', width: 150 },
     {
       field: 'statut',
       headerName: 'Statut',
       width: 150,
       renderCell: (params) => {
         const statut = params.value as string;
-        return (
-          //@ts-ignore
-          <Chip color={status=='unvalidate' ? 'error' : 'success'} label={statut} size="small" />
-         
-        );
+        return <Chip color={statut === 'unvalidate' ? 'error' : 'success'} label={statut} size="small" />;
       },
     },
     {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      renderCell: (params) => {
-        const row = params.row as Commande;
-        return (
-          <>
-            <IconButton onClick={() => handleOpenModal(row)}>
-              <EditIcon color="primary" />
-            </IconButton>
-            <IconButton onClick={() => handleDelete(row.id)}>
-              <DeleteIcon color="error" />
-            </IconButton>
-          </>
-        );
-      },
+      field: 'createdAt',
+      headerName: 'Date de commande',
+      width: 200,
+      renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
     },
   ];
 
-  
-  const handleOpenModal = (mode: 'create' | 'edit', delivery?: Livraison) => {
+  const handleOpenModal = (mode: 'create' | 'edit', commande?: Commande) => {
     setModalMode(mode);
-    setSelectedDelivery(delivery || null);
+    setSelectedCommande(commande || null);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedDelivery(null);
+    setSelectedCommande(null);
   };
 
-  const handleSave = () => {
-    // Handle save logic here
-    handleCloseModal();
+  const handleDeleteCommande = (id: EntityId) => {
+    dispatch(deleteCommande(id));
   };
+
+  const handleProduitChange = (event: { target: { value: any } }) => {
+    const produitId = event.target.value as string;
+    const selected = produits.find((produit) => produit?._id === produitId);
+    setSelectedProduit(selected || null);
+    formik.setFieldValue('produit', produitId);
+    formik.setFieldValue('prix', selected?.prix);
+  };
+
+  useEffect(() => {
+    const montant = formik.values.quantite * formik.values.prix;
+    formik.setFieldValue('montant', montant);
+  }, [formik.values.quantite, formik.values.prix]);
 
   return (
-    <>
-      <div className='min-w-10/12 p-7'>
-      <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Gestion de commandes</Typography>
-        </Stack>
-        <div>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Import
-            </Button>
-            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Export
-            </Button>
-          </Stack>
+    <div className='w-full h-screen p-8 bg-gray-200'>
+      <Stack direction="row" spacing={3} mb={3}>
+        <Typography variant="h4">Gestion de commandes</Typography>
+      </Stack>
+
+      <Box>
+        <div className='flex items-center justify-between mb-4'>
+          <Typography variant="h5" className='text-blue-500'>Tableau des commandes</Typography>
+          <Button variant="contained" color="primary" onClick={() => handleOpenModal('create')}>
+            Nouvelle commande
+          </Button>
         </div>
-          
-        </Stack>    
-        
 
-        <div style={{ height: 500, width: '99%' }} className='mt-[25px]'>
-          <Box>
-            <Box className='flex justify-between mb-3'>
-              <Typography className='m-3 text-4xl text-blue-500' sx={{fontSize:'2rem',margin:'3 0'}}>Liste des Commandes</Typography>
-              <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" >
-              Nouvelle commande
-            </Button>
-              </Box>
-            <DataGrid
-              rows={commandes}
-              columns={columns}
-              loading={status}
-              checkboxSelection
-              disableRowSelectionOnClick
-              onRowSelectionModelChange={(newSelectionModel) => {
-                setSelectionModel(newSelectionModel);
-              }}
-              rowSelectionModel={selectionModel}
-            />
-          </Box>
+        {commandes.length > 0 ? (
+          <DataGrid
+            rows={commandes}
+            columns={columns}
+            pagination
+            checkboxSelection
+            onRowSelectionModelChange={(newSelection) => setSelectionModel(newSelection)}
+            rowSelectionModel={selectionModel}
+          />
+        ) : (
+          <div>No content</div>
+        )}
+      </Box>
 
-          <Modal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-      >
+      {/* Modal for creating/editing a Commande */}
+      <Modal open={isModalOpen} onClose={handleCloseModal}>
         <Box
           className="max-w-lg p-6 mx-auto mt-10 bg-white rounded"
           sx={{
             position: 'absolute',
             top: '40%',
             left: '50%',
-            
             transform: 'translate(-40%, -50%)',
             width: '90%',
             maxWidth: '700px',
           }}
+          component='form' onSubmit={formik.handleSubmit}
         >
           <Typography variant="h6" component="h2" className="mb-4">
-            {modalMode === 'create' ? 'Bon d\'entree ' : 'Modifier Livraison'}
+            {modalMode === 'create' ? 'Nouvelle Commande' : 'Modifier Commande'}
           </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Point de Vente"
-                value={pointVente?._id || ''}
-                onChange={(e) => setPointVente(e.target.value)}
-              >
-                <MenuItem value="1">Point de Vente 1</MenuItem>
-                <MenuItem value="2">Point de Vente 2</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Catégorie"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {categories.map((cat) => (
-                  <MenuItem key={cat._id} value={cat._id}>
-                    {cat.nom}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Produit"
-                value={produit}
-                onChange={(e) => setProduit(e.target.value)}
-              >
-                {produits.map((prod) => (
-                  <MenuItem key={prod._id} value={prod._id}>
-                    {prod.nom}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Prix"
-                value={prix}
-                onChange={(e) => setPrix(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Quantité"
-                value={quantite}
-                onChange={(e) => setQuantite(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Montant"
-                value={montant}
-                onChange={(e) => setMontant(e.target.value)}
-                disabled
-              />
-            </Grid>
-          </Grid>
-          <Box className="flex justify-end mt-4">
-            <button 
-            onClick={handleSave}
-            className="px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Client</InputLabel>
+            <Select
+              name="client"
+              value={formik.values.client}
+              onChange={formik.handleChange}
+              error={formik.touched.client && Boolean(formik.errors.client)}
             >
-              {modalMode === 'create' ? 'Créer' : 'Modifier'}
-            </button>
-            <button 
-            onClick={handleCloseModal}
-            className="px-4 py-2 m-3 text-white bg-red-600 rounded-lg shadow-md bg--600 hover:bg-red-500">
+              {clients.map((client) => (
+                <MenuItem key={client._id} value={client._id}>
+                  {client.nom}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Produit</InputLabel>
+            <Select
+              name="produit"
+              value={formik.values.produit}
+              onChange={handleProduitChange}
+              error={formik.touched.produit && Boolean(formik.errors.produit)}
+            >
+              {produits.map((produit) => (
+                <MenuItem key={produit._id} value={produit._id}>
+                  {produit.nom}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            fullWidth
+            margin="normal"
+            id="quantite"
+            name="quantite"
+            label="Quantité"
+            type="number"
+            value={formik.values.quantite}
+            onChange={formik.handleChange}
+            error={formik.touched.quantite && Boolean(formik.errors.quantite)}
+            helperText={formik.touched.quantite && formik.errors.quantite}
+          />
+
+          <TextField
+            fullWidth
+            margin="normal"
+            id="prix"
+            name="prix"
+            label="Prix"
+            type="number"
+            value={formik.values.prix}
+            onChange={formik.handleChange}
+            error={formik.touched.prix && Boolean(formik.errors.prix)}
+            helperText={formik.touched.prix && formik.errors.prix}
+            InputProps={{ readOnly: true }}
+          />
+
+          <TextField
+            fullWidth
+            margin="normal"
+            id="montant"
+            name="montant"
+            label="Montant"
+            type="number"
+            value={formik.values.montant}
+            onChange={formik.handleChange}
+            error={formik.touched.montant && Boolean(formik.errors.montant)}
+            helperText={formik.touched.montant && formik.errors.montant}
+            InputProps={{ readOnly: true }}
+          />
+
+          <Stack direction="row" spacing={2} mt={2}>
+            <Button type="submit" variant="contained" color="primary">
+              {modalMode === 'create' ? 'Ajouter' : 'Enregistrer'}
+            </Button>
+            <Button onClick={handleCloseModal} variant="outlined" color="secondary">
               Annuler
-            </button>
-          </Box>
+            </Button>
+          </Stack>
         </Box>
       </Modal>
-        </div>
-      </div>
-    </>
+      <ToastContainer />
+    </div>
   );
 };
 
