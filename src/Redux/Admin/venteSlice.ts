@@ -89,6 +89,20 @@ export const fetchVentesByPointVente = createAsyncThunk(
   }
 );
 
+export const fetchSolde = createAsyncThunk(
+  'vente/fetchSolde',
+  async ({ pointVenteId, produitId }: { pointVenteId: string; produitId: string }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/stockVariations/pointVente/${pointVenteId}/${produitId}/solde`);
+      console.log(response.data.solde)
+      return response.data.solde;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+
 // Code pour l'importation et l'exportation de fichiers
 export const exportVentes = createAsyncThunk('vente/export', async (format: 'csv' | 'xlsx') => {
   const response = await axiosInstance.get(`/file/vente/export?format=${format}`, {
@@ -117,11 +131,39 @@ export const importVentes = createAsyncThunk('vente/import', async (file: File,{
   }
 });
 
+// Fonction pour générer la facture pour les ventes
+export const generateInvoicePdf = createAsyncThunk(
+  'vente/generateInvoicePdf',
+  async (invoiceData: { client: any; ventes: string[] }, { rejectWithValue }) => {
+    try {
+      // Requête pour générer la facture
+      const response = await axiosInstance.post('/print/facture', invoiceData, {
+        responseType: 'blob', // Important pour recevoir le fichier PDF en tant que blob
+      });
+
+      // Créer un lien pour télécharger le fichier PDF
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'facture.pdf'); // Nom du fichier à télécharger
+      document.body.appendChild(link);
+      link.click();
+      link.remove(); // Supprime le lien après le clic
+
+      return response.data; // Retourne le blob pour un usage éventuel
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+
 const initialState = venteAdapter.getInitialState({
   loading: false,
   status : '',
   error: null,
   total: 0,
+  soldeVenteProduit: 0, // État pour stocker le solde
 });
 
 const venteSlice = createSlice({
@@ -233,7 +275,40 @@ const venteSlice = createSlice({
         state.loading = false;
          //@ts-ignore
         state.error = action.error.message;
+      })
+      .addCase(fetchSolde.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSolde.fulfilled, (state, action) => {
+        state.loading = false;
+        state.soldeVenteProduit = action.payload; // Stocker le solde récupéré
+      })
+      .addCase(fetchSolde.rejected, (state, action) => {
+        state.loading = false;
+        //@ts-ignore
+        state.error = action.payload as string;
+      })
+      .addCase(generateInvoicePdf.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(generateInvoicePdf.fulfilled, (state, action) => {
+        state.loading = false;
+        const url = window.URL.createObjectURL(new Blob([action.payload]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'facture.pdf');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .addCase(generateInvoicePdf.rejected, (state, action) => {
+        state.loading = false;
+        //@ts-ignore
+        state.error = action.payload as string;
       });
+
   },
 });
 

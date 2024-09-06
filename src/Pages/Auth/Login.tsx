@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useEffect, useState } from 'react'
-import { Box, Button, Container, TextField, Typography, Avatar, InputAdornment } from '@mui/material';
+import { Box, Button, Container, TextField, Typography, Avatar, InputAdornment,CircularProgress } from '@mui/material';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Phone, Lock } from '@mui/icons-material';
 import logo from '@/images/ai-generated-8201392_1280.png'
@@ -8,6 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { fetchUsers, loginUser, selectAllUsers } from '@/Redux/Auth/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/Redux/Store';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 interface IFormInput {
   phone: string;
@@ -22,6 +26,8 @@ const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const users = useSelector((state: RootState) => selectAllUsers(state));
+  const [loading, setLoading] = useState(false);
+  const addStatus = useSelector((state:RootState)=>state.users.status)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const auth = useSelector((state: RootState) => state.users);
   useSelector((state: RootState) => state.users);
@@ -33,9 +39,17 @@ const Login = () => {
     console.log(users);
   }, []);
 
+  useEffect(()=>{
+    if (addStatus === 'failed') {
+      toast.error(`Erreur: numero ou mot de passe incorrect`);
+    }
+
+  },[addStatus])
+
   const onSubmit: SubmitHandler<IFormInput> = async data => {  
-    
-   const resultAction = await dispatch(loginUser({numero:data.phone,password:data.password}));
+    try {
+      setLoading(true)
+      const resultAction = await dispatch(loginUser({numero:data.phone,password:data.password}));
     if (loginUser.fulfilled.match(resultAction)) {
       //console.log('the connected user is => : ',auth)
       //console.log('Login succeeded:', resultAction.payload);
@@ -52,10 +66,20 @@ const Login = () => {
       }
     }
     reset()
+      
+    } catch (error) {
+      console.log(error)
+      
+    }finally{
+      setLoading(false)
+    }
+    
+   
     
   };
 
   return (
+    <>
     <Container
       component="main"
       maxWidth={false}
@@ -143,7 +167,7 @@ const Login = () => {
             error={!!errors.password}
             helperText={errors.password?.message}
           />
-          <Button
+          {/* <Button
           className='p-3 m-3'
             type="submit"
             fullWidth
@@ -151,11 +175,34 @@ const Login = () => {
             color="primary"
             sx={{ mt: 4, mb: 2 ,padding: '16px auto'}}
           >
-            Se connecter
-          </Button>
+             {loading ? <CircularProgress size={24} /> : 'se connecter'}
+          </Button> */}
+
+          <button
+          disabled={loading}
+           type="submit"  // Assurez-vous que le bouton est de type "submit"
+            className=" px-4 py-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500 w-full"
+          >
+           {loading ? <CircularProgress size={24} /> : 'se connecter'}
+          </button>
         </Box>
       </Box>
+
+
     </Container>
+    <ToastContainer 
+       position="top-center"
+       autoClose={5000}
+       hideProgressBar={false}
+       newestOnTop={false}
+       closeOnClick
+       rtl={false}
+       pauseOnFocusLoss
+       draggable
+       pauseOnHover
+      />
+    </>
+  
   );}
   export default Login
 

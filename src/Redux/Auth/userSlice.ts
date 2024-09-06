@@ -150,6 +150,7 @@ export const findUserById = createAsyncThunk('users/findById', async (id: string
 
 const userSlice = createSlice({
   name: 'users',
+ // status : '',
   initialState,
   reducers: {},
   extraReducers: (builder) => {

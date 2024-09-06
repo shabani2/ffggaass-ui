@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, TextField, Select, MenuItem, FormControl, InputLabel, Grid, CircularProgress, Modal, Typography, IconButton } from '@mui/material';
@@ -17,6 +16,9 @@ import 'jspdf-autotable';
 import {Download as DownloadIcon} from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { fetchPointVentes, selectAllPointVentes } from '@/Redux/Admin/pointVenteSlice';
+import { addLivraison } from '@/Redux/Admin/livraisonSlice';
+
 
 
 
@@ -27,12 +29,6 @@ const validationSchema = yup.object({
   category: yup.string().required('Category is required'),
 });
 
-const validationClientSchema = yup.object({ 
-  name: yup.string().required('name is required'),
-  numero: yup.string().required('numero is required'),
-  adresse:yup.string().required('adresse is required'),
-});
-
 const Caisse: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
   const produits = useSelector((state: RootState) => selectAllProduits(state));
@@ -40,19 +36,21 @@ const Caisse: React.FC = () => {
 
   const [filteredProduits, setFilteredProduits] = useState<Produit1[]>([]);
   const [selectedProduit, setSelectedProduit] = useState<Produit1 | null>(null);
-  const [client,setClient] = useState({nom:'',numero:'',adresse:''})
+  const [pv,setPv] = useState('')
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const pointventes = useSelector((state: RootState) => selectAllPointVentes(state));
  
   const user = useSelector(selectCurrentUser);
 
-  const [products, setProducts] = useState<Vente[]>([]);
-  const addStatus = useSelector((state: RootState) => state.vente.status);
+  const [products, setProducts]:livraison[]= useState<Livraison[]>([]);
+  const addStatus = useSelector((state: RootState) => state.livraison.status);
  
 
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchProduits());
+    dispatch(fetchPointVentes())
   }, [dispatch]);
 
   useEffect(() => {
@@ -99,7 +97,7 @@ const Caisse: React.FC = () => {
     const selected = produits.find((produit) => produit?._id === produitId);
     setSelectedProduit(selected || null);
     formik.setFieldValue('produit', produitId);
-    formik.setFieldValue('prix', selected?.prixVente);
+    formik.setFieldValue('prix', selected?.prix);
   };
 
   useEffect(() => {
@@ -109,17 +107,7 @@ const Caisse: React.FC = () => {
 
   const totalAmount = products.reduce((acc, product) => acc + product.montant, 0);
 
-  const clientFormik = useFormik({
-    initialValues: {nom: '', numero: '', adresse: ''},
-    validationSchema: validationClientSchema,
-    onSubmit: (values, { resetForm }) => {
-      console.log('Form Submitted', client);
-      products.forEach((p) => dispatch(addVente(p)));
-      setClient(values);
-      resetForm();
-      setProducts([]);
-    },
-  });
+ 
   const handleChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
     setClient({
@@ -127,19 +115,20 @@ const Caisse: React.FC = () => {
       [name]: value,
     });
   };
-  const validateFacture = async (e: { preventDefault: () => void; }) => {
+  const validateLivraison = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setLoading(true); // Commencez le chargement
-
-    try {
-      console.log('Form Submitted', client);
-      for (const p of products) {
-        await dispatch(addVente(p)); // Ajoutez des ventes une par une
+    try {      
+      
+      products.forEach(async (p)=> {
+        p = {...p,pointVente:pv}
+        //console.log('pv id :', p);
+         await dispatch(addLivraison(p)); // Ajoutez des ventes une par une
         if(addStatus=='fulfilled'){
           toast.success('Vente effectuee avec succes');
         }
         
-      }     
+      }  )   
      
       setProducts([]);
       //setModalOpen(true)
@@ -181,89 +170,18 @@ const Caisse: React.FC = () => {
     setClient({ nom: '', numero: '', adresse: '' });
     setModalOpen(false);
   };
-  const handleModalClose = () => {
-    setModalOpen(false);
-    setClient({ nom: '', numero: '', adresse: '' });
-  };
+  
 
   return (
     <>
-    <Modal
-          open={modalOpen}
-          onClose={handleModalClose}
-          aria-labelledby="modal-title"
-          aria-describedby="modal-description"
-          
-        >
-          <Box        
-           
-            sx={{
-              maxWidth:"90%",
-              display:"flex",
-              flexDirection:"column",
-              justifyContent:"center",
-              alignItems:"center",
-              bgcolor:"background.paper",
-              p:4,
-              position:"fixed",
-              borderRadius:4,
-              boxShadow:3,
-              width:"400px",
-              top:"50%",
-              left:"50%",
-              transform:"translate(-50%, -50%)"
-            }}
-          >
-            <Typography variant="h6" id="modal-title" gutterBottom>
-              imprimer la facture
-            </Typography>
-
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              flexGrow={1}
-              mt={2}
-            >
-              <IconButton
-                color="primary"
-                style={{ fontSize: '3rem' }} // Grande taille pour l'icône
-                onClick={generateInvoicePDF}
-              >
-                <DownloadIcon />
-              </IconButton>
-            </Box>
-
-            <Box
-              display="flex"
-              justifyContent="flex-end"
-              gap={1}
-              mt={2}
-            >
-              <button
-                onClick={generateInvoicePDF}
-                 className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
-              >
-                confirmer
-              </button>
-
-              <button
-                onClick={handleModalClose}
-                 className="px-4 py-2 text-white bg-red-600 rounded-lg shadow-md hover:bg-red-500"
-              >
-                annuler
-              </button>
-            </Box>
-          </Box>
-    </Modal>
+    
     <div className='p-[2rem] w-full bg-gray-300'>
     
       
     <div className="flex flex-col items-center w-full min-h-screen p-6 ">
       {/* Header */}
       <header className="w-full p-6 mb-6 bg-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800">Gestion de  Caisse</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Operation de Bon d'Entre</h1>
       </header>
 
       {/* Main Content */}
@@ -394,7 +312,7 @@ const Caisse: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <span className="font-medium text-gray-600">{product?.produit?.nom}</span>
                   <span className="font-semibold text-gray-800">
-                    {product.quantite} x fc :{product?.produit?.prixVente}
+                    {product.quantite} x fc :{product?.produit?.prix}
                   </span>
                 </div>
                 <span className="font-bold text-gray-800">fc: {product.montant.toFixed(2)}</span>
@@ -405,58 +323,25 @@ const Caisse: React.FC = () => {
 
         {/* Invoice Creation Area */}
         <section className="p-6 bg-white rounded-lg shadow-lg">
-          <h2 className="mb-4 text-2xl font-semibold text-gray-700">Rédiger la Facture</h2>
+          <h2 className="mb-4 text-2xl font-semibold text-gray-700">Rédiger le Bon d'Entre</h2>
 
           {/* Client Information */}
-          <form  onSubmit={validateFacture} className="mb-4 space-y-4">
-            <input
-              type="text"
-              name="nom"
-              value={client.nom}
-              onChange={handleChange}
-              placeholder="Nom du client"
-              className={`w-full p-3 border rounded-lg focus:outline-none ${
-                clientFormik.touched.nom && clientFormik.errors.nom
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:border-blue-500"
-              }`}     
-             
-            />
-            {clientFormik.touched.nom && clientFormik.errors.nom ? (
-              <div className="mt-1 text-sm text-red-500">{clientFormik.errors.nom}</div>
-            ) : null}
-            <input
-              type="text"
-              name="numero"
-              value={client.numero}
-              onChange={handleChange}
-              placeholder="numero du client"
-             
-              className={`w-full p-3 border rounded-lg focus:outline-none ${
-                clientFormik.touched.nom && clientFormik.errors.nom
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:border-blue-500"
-              }`}
-            />
-            {clientFormik.touched.numero&& clientFormik.errors.numero? (
-              <div className="mt-1 text-sm text-red-500">{clientFormik.errors.numero}</div>
-            ) : null}
-             <input
-              type="text"
-              name="adresse"
-              value={client.adresse}
-              onChange={handleChange}
-              placeholder="Adresse du client"
-              className={`w-full p-3 border rounded-lg focus:outline-none ${
-                clientFormik.touched.nom && clientFormik.errors.nom
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:border-blue-500"
-              }`}
-              
-            />
-              {clientFormik.touched.adresse && clientFormik.errors.adresse ? (
-              <div className="mt-1 text-sm text-red-500">{clientFormik.errors.adresse}</div>
-            ) : null}
+          <form  onSubmit={validateLivraison} className="mb-4 space-y-4">
+            <FormControl fullWidth margin="normal">
+                  <InputLabel>Point de vente</InputLabel>
+                  <Select
+                    name="pointvente"
+                    value={pv}
+                    onChange={(e)=>setPv(e.target.value)}
+                    required                   
+                     >
+                    {pointventes.map((pv) => (
+                      <MenuItem key={pv.id} value={pv.id}>
+                        {pv.nom}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
           {/* Selected Products Summary */}
           <div className="mb-4 space-y-2">
@@ -464,7 +349,7 @@ const Caisse: React.FC = () => {
               <div key={index} className="flex items-center justify-between">
                 <span className="text-gray-600">{product?.produit.nom}</span>
                 <span className="font-semibold text-gray-800">
-                  fc: {product?.produit.prixVente} x {product.quantite}
+                  fc: {product?.produit.prix} x {product.quantite}
                 </span>
               </div>
             ))}

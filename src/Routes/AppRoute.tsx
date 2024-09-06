@@ -7,7 +7,7 @@ const Livraison = lazy(()=>import('../Pages/Admins/Livraison'))
 const Produit = lazy(()=>import('../Pages/Admins/Produit'))
 const Profile = lazy(()=>import('../Pages/Admins/Profile'))
 const Stock = lazy(()=>import('../Pages/Admins/Stock'))
-//const Vente = lazy(()=>import('../Pages/Admins/Vente'))
+const Vente = lazy(()=>import('../Pages/Admins/Vente'))
 const Configuration = lazy(()=>import('../Pages/Admins/Configuration'))
 const Client = lazy(()=>import('../Pages/Admins/ClientPage.tsx'))
 const commande = lazy(()=>import('../Pages/Admins/CommandePage.tsx'))
@@ -41,12 +41,18 @@ const coreRoutes = [
     component: Produit,
   },
   {
-    path: '/livraison',
-    title: 'Livraisons',
-    component: Livraison,
+    path: '/caisse',
+    title: 'Bon de livraison',
+    component: Caisse,
   },
   {
-    path: '/vente',
+    path: '/livraison',
+    title: 'Fiche de Livraisons',
+    component: Livraison,
+  },
+ 
+  {
+    path: '/bonEntre',
     title: 'Bon d\'entre',
     component: bonEntre,
   },
@@ -60,16 +66,12 @@ const coreRoutes = [
     title: 'Commandes',
     component: commande,
   },
-  // {
-  //   path: '/bon-entre',
-  //   title: 'Bon d\'entre',
-  //   component: bonEntre,
-  // },
   {
-    path: '/caisse',
-    title: 'Caisse',
-    component: Caisse,
+    path: '/vente',
+    title: 'Rapport de ventes',
+    component: Vente,
   },
+ 
   {
     path: '/stock',
     title: 'Stock',

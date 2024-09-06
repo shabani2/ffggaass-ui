@@ -21,6 +21,7 @@ import LogoutIcon from '@mui/icons-material/Logout'
 //import { makeStyles } from '@material-ui/core/styles';
 import { FaBell } from 'react-icons/fa';
 import { Badge,Tooltip } from '@mui/material';
+import {selectCurrentUser} from '@/Redux/Auth/userSlice'
 
 const drawerWidth = 350;
 
@@ -126,6 +127,7 @@ const { user, status, error } = useSelector((state: RootState) => state.users);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const [userId, setUserId] = useState<string>('');
 const dispatch = useDispatch<AppDispatch>();
+const user1 = useSelector(selectCurrentUser)
 
   
   // const classes = useStyles();
@@ -263,8 +265,15 @@ const dispatch = useDispatch<AppDispatch>();
         <Typography variant="h6" className='mr-5 text-white'>FFGGAASS</Typography>
       </Box>
       <Divider />
-      {user?.role=='Vendeur' ? <VendeurOnglet/> : <AdminOnglet/>}
-      {/* <AdminOnglet/> */}
+      <div className='flex-1'>
+        {user?.role=='Vendeur' ? <VendeurOnglet/> : <AdminOnglet/>}
+        {/* <AdminOnglet/> */}
+
+      </div>
+      <div className='p-3 flex'>
+          <h6 className='text-gray-400 p-5'>Application realise par Inaf</h6>
+      </div>
+     
     </Drawer>      
       <Main open={!isMobile && open} className='bg-white ' sx={{minHeight:'100vh',width:`100%`,  padding:'0'}}>
         <DrawerHeader />

@@ -4,6 +4,7 @@ import { Home, Category, LocalShipping, Store, Settings, Person, Inventory, Peop
 import {Link } from 'react-router-dom';
 import routes from '@/Routes/AppRoute';
 import {ReceiptIcon, ShoppingCart } from 'lucide-react';
+import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 
 
 
@@ -13,14 +14,15 @@ import {ReceiptIcon, ShoppingCart } from 'lucide-react';
   const icons: { [key: string]: React.ReactElement } = {
     'Acceuil': <Home />,
     'Produit': <Category />,
-    'Livraisons': <LocalShipping />,
+    'Fiche de Livraisons': <LocalShipping />,
     'Bon d\'entre': <ReceiptIcon />,
-    'Caisse': <Store />,
+    'Bon de livraison': <Store />,
     'Stock': <Inventory />,
     'Configuration': <Settings />,
     'Profile': <Person />,
     'Clients' : <People/>,
-    'Commandes': <ShoppingCart/>
+    'Commandes': <ShoppingCart/>,
+    'Rapport de ventes' : <PointOfSaleIcon />,
     
   };
 const AdminOnglet = () => {
