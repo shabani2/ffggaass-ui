@@ -19,11 +19,11 @@ export interface StockVariation {
   solde: number
 }
 
-interface StockVariationState {
-  items: StockVariation[];
-  loading: boolean;
-  error: string | null;
-}
+// interface StockVariationState {
+//   items: StockVariation[];
+//   loading: boolean;
+//   error: string | null;
+// }
 
 // Adaptateur pour les opérations CRUD sur StockVariation
 //@ts-ignore

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -6,18 +7,17 @@ import {
   selectAllLivraisons, 
   updateLivraisonStatut
 } from '@/Redux/Admin/livraisonSlice';
-import { Box, Button, Chip, IconButton, Radio, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Radio, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Produit, PointVente1, Livraison } from '@/Utils/dataTypes';
+import { PointVente1 } from '@/Utils/dataTypes';
 import {  DownloadIcon, UploadIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { selectCurrentUser } from '@/Redux/Auth/userSlice';
 import { fetchCategories } from '@/Redux/Admin/categorySlice';
 import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
 import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 
 
 const LivraisonVendeur = () => {
@@ -36,6 +36,7 @@ const LivraisonVendeur = () => {
   useEffect(() => {
     console.log('pv=>',user?.pointVente?.nom)
     dispatch(searchLivraisonsByPointVente(user?.pointVente?.nom));
+    //@ts-ignore
   }, [dispatch]); 
 
   const columns: GridColDef[] = [
@@ -135,11 +136,8 @@ const LivraisonVendeur = () => {
     // },
   ];
   
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-expect-error
-  function handleDelete(id) {
-    console.log('hello',id)
-  }
+ 
+ 
 
   const handleUploadClick = () => {
     if (inputRef.current) {

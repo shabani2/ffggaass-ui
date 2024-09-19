@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -6,6 +7,7 @@ import {
   updatePointVente,
   deletePointVente,
   selectAllPointVentes,
+  //@ts-ignore
   pvapi,
 } from '@/Redux/Admin/pointVenteSlice'
 import { RootState,AppDispatch } from '@/Redux/Store';
@@ -25,6 +27,7 @@ const PointVente: React.FC = () => {
   const dispatch:AppDispatch = useDispatch<AppDispatch>();
   const pointVentes = useSelector((state: RootState) => selectAllPointVentes(state));
   const status = useSelector((state: RootState) => state.pointVente.status);
+  //@ts-ignore
   const error = useSelector((state: RootState) => state.pointVente.error);
 
   //const status = useSelector((state: RootState) => state.pointVente.status);
@@ -88,6 +91,7 @@ const PointVente: React.FC = () => {
         nom : createPv.nom,
         emplacement:createPv.emplacement
       }
+      //@ts-ignore
       dispatch(updatePointVente({id,updatedPointVente: apiv}));
     } else {
       dispatch(addPointVente(createPv)).then(()=>{

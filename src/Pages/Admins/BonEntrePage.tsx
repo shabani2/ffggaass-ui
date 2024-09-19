@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button, Stack, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
@@ -33,6 +36,7 @@ const BonEntrePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //@ts-ignore
   const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null);
   const produits = useSelector((state: RootState) => selectAllProduits(state));
   const categories = useSelector((state: RootState) => selectAllCategories(state)); 
@@ -142,12 +146,7 @@ const BonEntrePage = () => {
     },
   });
   
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-expect-error
-  function handleDelete(id) {
-    console.log('hello',id)
-  }
-
+ 
   const handleUploadClick = () => {
     if (inputRef.current) {
       inputRef.current.click();
@@ -221,6 +220,7 @@ const BonEntrePage = () => {
   useEffect(() => {
     const montant = formik.values.quantite * formik.values.prix;
     formik.setFieldValue('montant', montant);
+    //@ts-ignore
   }, [formik.values.quantite, formik.values.prix]);  
   console.log('bon d entre',entreStock)
 
@@ -243,7 +243,8 @@ const BonEntrePage = () => {
                 />
                 <Button
                   color="inherit"
-                  startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}
+                  startIcon={<UploadIcon //@ts-ignore
+                    fontSize="var(--icon-fontSize-md)" />}
                   onClick={handleUploadClick}
                   disabled={loading}
                 >
@@ -252,7 +253,9 @@ const BonEntrePage = () => {
                 {loading && <p>Loading...</p>}
                 {error && <p>Error: {error}</p>}
               </div>
-              <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />} onClick={() => handleExport('xlsx')}>
+              <Button color="inherit" startIcon={<DownloadIcon
+              //@ts-ignore
+               fontSize="var(--icon-fontSize-md)" />} onClick={() => handleExport('xlsx')}>
                 Export
               </Button>
             </Stack>

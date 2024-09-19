@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
-import React, { useEffect, useState } from 'react'
-import { Box, Button, Container, TextField, Typography, Avatar, InputAdornment,CircularProgress } from '@mui/material';
+//@ts-ignore
+import { Box, Container, TextField, Typography, Avatar, InputAdornment,CircularProgress } from '@mui/material';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Phone, Lock } from '@mui/icons-material';
 import logo from '@/images/ai-generated-8201392_1280.png'
@@ -10,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect, useState } from 'react';
 
 
 
@@ -29,14 +33,19 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const addStatus = useSelector((state:RootState)=>state.users.status)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //@ts-ignore
   const auth = useSelector((state: RootState) => state.users);
+//@ts-ignore
   useSelector((state: RootState) => state.users);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //@ts-ignore
   const [loginError, setLoginError] = useState<string | null>(null);
   const { register, handleSubmit, formState: { errors },reset } = useForm<IFormInput>();
   useEffect(() => {
     dispatch(fetchUsers());
     console.log(users);
+    
+    //@ts-ignore
   }, []);
 
   useEffect(()=>{

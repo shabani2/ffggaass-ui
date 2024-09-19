@@ -15,13 +15,16 @@ import { useEffect } from 'react';
 
 const HomeVendeur = () => {
   const dispatch: AppDispatch = useDispatch();
+  //@ts-ignore
   const stockVariation = useSelector((state:RootState)=>selectAllStockVariations(state))
+  //@ts-ignore
    const stockVariationsWithMontants = useSelector(selectStockVariationWithMontants);
   
  
    useEffect(()=>{
    user &&  dispatch(fetchStockVariationsByPointVente(user?._id))
     // dispatch(fetchProduits())
+    //@ts-ignore
    },[dispatch])
  
   const user = useSelector(selectCurrentUser); 

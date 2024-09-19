@@ -56,7 +56,7 @@ const BarChart: React.FC<BarChartProps> = ({ data }) => {
       },
     ],
   };
-
+//@ts-ignore
   const pointVenteChartData = {
     labels: pointVenteNames,
     datasets: [

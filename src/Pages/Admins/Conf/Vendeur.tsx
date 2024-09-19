@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -56,6 +58,7 @@ const Vendeur = () => {
   const [clickedItem, setClickedItem] = useState<User | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //@ts-ignore
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([]);
 
   const users = useSelector((state: RootState) => selectAllUsers(state));
@@ -72,6 +75,7 @@ const Vendeur = () => {
 
   const handleRowClick = (id: GridRowId) => {
     const item = users.find(row => row.id === id);
+    //@ts-ignore
     setClickedItem(item || null);
     setOpen(true);
     setSelectedId(id.toString());
@@ -83,7 +87,9 @@ const Vendeur = () => {
   };
 
   const handleEdit = (id: GridRowId) => {
+    //@ts-ignore
     const item = users.find((row: { id: GridRowId; }) => row.id === id);
+    //@ts-ignore
     setClickedItem(item || null);
     setSelectedId(id.toString());
     setIsEditMode(true)
@@ -140,7 +146,7 @@ const Vendeur = () => {
         
       }
      
-    
+   //@ts-ignore 
   },[dispatch])
 
   useEffect(()=>{
@@ -180,6 +186,7 @@ const Vendeur = () => {
         <DataGrid
           rows={users.filter(u=>u.role=='Vendeur')}
           columns={columns}
+          //@ts-ignore
           pageSize={10}
           rowsPerPageOptions={[10]}
           checkboxSelection

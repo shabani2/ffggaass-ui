@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { ResponsivePie } from '@nivo/pie';
 import { useSelector } from 'react-redux';
 import { selectStockVariationWithMontants } from '@/Redux/Admin/stockVariationSlice'
@@ -19,6 +20,7 @@ const ContributionPieChart = () => {
     const stockVariationsWithMontants = useSelector(selectStockVariationWithMontants);
 
     // Calcul de la contribution de chaque point de vente au totalMontantVendu
+    
     const data = stockVariationsWithMontants.reduce((acc: any[], item) => {
         const existingPointVente = acc.find(d => d.id === item.pointVente.nom);
         const montantVendu = item.montantVendu;

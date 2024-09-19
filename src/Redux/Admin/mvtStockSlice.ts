@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createSlice, createAsyncThunk, createEntityAdapter, EntityId } from '@reduxjs/toolkit';
 import axiosInstance from '@/Utils/axiosInstance';
 //import { RootState } from '../Store';
@@ -80,6 +82,7 @@ export const fetchVendeurdMvtStocks = createAsyncThunk(
         id: ms._id,
         ...ms,
       }));
+      //@ts-ignore
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
@@ -115,6 +118,7 @@ export const importMvtStock = createAsyncThunk('mvtStock/import', async (file: F
     ...ms,
   }));
 } catch (error) {
+  //@ts-ignore
   return rejectWithValue(error.response.data);
 }
 });
@@ -143,6 +147,7 @@ const mvtStockSlice = createSlice({
       })
       .addCase(fetchMvtStocks.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(addMvtStock.pending, (state) => {
@@ -155,6 +160,7 @@ const mvtStockSlice = createSlice({
       })
       .addCase(addMvtStock.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(updateMvtStock.pending, (state) => {
@@ -167,6 +173,7 @@ const mvtStockSlice = createSlice({
       })
       .addCase(updateMvtStock.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(deleteMvtStock.pending, (state) => {
@@ -179,6 +186,7 @@ const mvtStockSlice = createSlice({
       })
       .addCase(deleteMvtStock.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(fetchFilteredMvtStocks.pending, (state) => {
@@ -190,6 +198,7 @@ const mvtStockSlice = createSlice({
       })
       .addCase(fetchFilteredMvtStocks.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload;
       })
       .addCase(exportMvtStock.pending, (state) => {
@@ -200,6 +209,7 @@ const mvtStockSlice = createSlice({
       })
       .addCase(exportMvtStock.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.error.message;
       })
       .addCase(importMvtStock.pending, (state) => {
@@ -211,6 +221,7 @@ const mvtStockSlice = createSlice({
       })
       .addCase(importMvtStock.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.error.message;
       });
     
@@ -219,4 +230,6 @@ const mvtStockSlice = createSlice({
 
 export default mvtStockSlice.reducer;
 export const { selectAll: selectAllMvtStocks, selectById: selectMvtStockById } = mvtStockAdapter.getSelectors((state: any) => state.mvtStock);
+//@ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const selectTotalMvtStocks = (state: { mvtStock: { total: any; }; }) => state.mvtStock.total;

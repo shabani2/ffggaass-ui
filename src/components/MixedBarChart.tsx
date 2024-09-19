@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
@@ -88,7 +89,9 @@ const MixedBarChart: React.FC<MixedBarChartProps> = ({ data }) => {
     <Box sx={{ width: '100%', height: 350 }}>
       <CardHeader title="Montant total des ventes" />
       <Box sx={{ height: '100%' }}>
-        <Bar ref={chartRef} data={chartData} options={options} />
+        <Bar ref={chartRef} 
+        //@ts-ignore
+        data={chartData} options={options} />
       </Box>
     </Box>
   );

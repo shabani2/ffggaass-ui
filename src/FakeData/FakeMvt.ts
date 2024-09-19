@@ -1,5 +1,5 @@
 import { fakeMtvt } from "@/components/ui/PieChart";
-import { EntityId } from "@reduxjs/toolkit";
+//import { EntityId } from "@reduxjs/toolkit";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // interface fakeMtvt{

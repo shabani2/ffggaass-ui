@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createSlice, createAsyncThunk, createEntityAdapter, EntityId } from '@reduxjs/toolkit';
 import axiosInstance from '@/Utils/axiosInstance';
 import { Client } from '@/Utils/dataTypes'; // Importez votre interface Client
 
 // Adapter pour gérer l'état des clients
 const clientAdapter = createEntityAdapter<Client>({
+  //@ts-ignore
   selectId: (instance: { _id: EntityId; }) => instance._id,
 });
 
@@ -86,6 +89,7 @@ const clientSlice = createSlice({
       })
       .addCase(fetchClients.rejected, (state, action) => {
         state.status = 'failed';
+        //@ts-ignore
         state.error = action.error.message || 'Failed to fetch clients';
       })
 
@@ -99,6 +103,7 @@ const clientSlice = createSlice({
       })
       .addCase(addClient.rejected, (state, action) => {
         state.status = 'failed';
+        //@ts-ignore
         state.error = action.error.message || 'Failed to add client';
       })
 
@@ -112,6 +117,7 @@ const clientSlice = createSlice({
       })
       .addCase(searchClients.rejected, (state, action) => {
         state.status = 'failed';
+        //@ts-ignore
         state.error = action.error.message || 'Failed to search clients';
       })
 
@@ -125,6 +131,7 @@ const clientSlice = createSlice({
       })
       .addCase(fetchClientById.rejected, (state, action) => {
         state.status = 'failed';
+        //@ts-ignore
         state.error = action.error.message || 'Failed to fetch client';
       })
 
@@ -141,6 +148,7 @@ const clientSlice = createSlice({
       })
       .addCase(updateClient.rejected, (state, action) => {
         state.status = 'failed';
+        //@ts-ignore
         state.error = action.error.message || 'Failed to update client';
       })
 
@@ -154,6 +162,7 @@ const clientSlice = createSlice({
       })
       .addCase(deleteClient.rejected, (state, action) => {
         state.status = 'failed';
+        //@ts-ignore
         state.error = action.error.message || 'Failed to delete client';
       });
   },

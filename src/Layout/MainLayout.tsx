@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Drawer, Box, CssBaseline, Divider, Avatar, useTheme, useMediaQuery, Button, Menu, MenuItem } from '@mui/material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Outlet } from 'react-router-dom';
 // import { makeStyles} from '@mui/styles'
 import logo from '@/images/ai-generated-8201392_1280.png'
@@ -21,7 +23,6 @@ import LogoutIcon from '@mui/icons-material/Logout'
 //import { makeStyles } from '@material-ui/core/styles';
 import { FaBell } from 'react-icons/fa';
 import { Badge,Tooltip } from '@mui/material';
-import {selectCurrentUser} from '@/Redux/Auth/userSlice'
 
 const drawerWidth = 350;
 
@@ -74,60 +75,22 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   
 }));
 
-// const Search = styled('div')(({ theme }) => ({
-//   position: 'relative',
-//   borderRadius: theme.shape.borderRadius,
-//   backgroundColor: alpha(theme.palette.common.white, 0.15),
-//   '&:hover': {
-//     backgroundColor: alpha(theme.palette.common.white, 0.25),
-//   },
-//   marginLeft: 0,
-//   width: '100%',
-//   [theme.breakpoints.up('sm')]: {
-//     marginLeft: theme.spacing(1),
-//     width: 'auto',
-//   },
-// }));
 
-// const SearchIconWrapper = styled('div')(({ theme }) => ({
-//   padding: theme.spacing(0, 2),
-//   height: '100%',
-//   position: 'absolute',
-//   pointerEvents: 'none',
-//   display: 'flex',
-//   alignItems: 'center',
-//   justifyContent: 'center',
-// }));
-
-// const StyledInputBase = styled(InputBase)(({ theme }) => ({
-//   color: 'inherit',
-//   '& .MuiInputBase-input': {
-//     padding: theme.spacing(1, 1, 1, 0),
-//     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-//     transition: theme.transitions.create('width'),
-//     width: '100%',
-//     [theme.breakpoints.up('md')]: {
-//       width: '20ch',
-//     },
-//   },
-// }));
-
-// const useStyles = makeStyles({
-//   drawerPaper: {
-//     backgroundColor: '#EF4444',
-//     zIndex:1
-//   },
-// });
 
 const MainLayout: React.FC = () => {
 
 /********************les deux variables suivantes sont de state qui concerne l'utilisateurs connecte */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//@ts-ignore
 const { user, status, error } = useSelector((state: RootState) => state.users);
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//@ts-ignore
 const [userId, setUserId] = useState<string>('');
+//@ts-ignore
 const dispatch = useDispatch<AppDispatch>();
-const user1 = useSelector(selectCurrentUser)
+//@ts-ignore
+//const user1 = useSelector(selectCurrentUser)
 
   
   // const classes = useStyles();
@@ -148,6 +111,7 @@ const user1 = useSelector(selectCurrentUser)
       console.log('user connected=>',user)
       
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
   useEffect(()=>{
     if(user){

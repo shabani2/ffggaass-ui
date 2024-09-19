@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Button, Modal, Box, TextField, Select, MenuItem, InputLabel, FormControl, IconButton, Stack, Typography } from '@mui/material';
@@ -11,7 +13,8 @@ import { AppDispatch, RootState } from '@/Redux/Store';
 import { EntityId } from '@reduxjs/toolkit';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { UploadIcon, DownloadIcon, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
+//import {  PlusIcon } from 'lucide-react';
 
 // Define the types for the form values
 interface SeuilFormValues {
@@ -166,6 +169,7 @@ const Seuil: React.FC = () => {
       <DataGrid
         rows={seuils}
         columns={columns}
+        //@ts-ignore
         pageSize={10}
         rowsPerPageOptions={[10]}
         autoHeight

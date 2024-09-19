@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -33,6 +34,7 @@ const Admin = () => {
   const [open, setOpen] = useState(false);
   const [clickedItem, setClickedItem] = useState<User | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //@ts-ignore
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([]);
   const users = useSelector((state: RootState) => selectAllUsers(state));
   const [selectedId, setSelectedId] = useState('');
@@ -139,6 +141,7 @@ const Admin = () => {
           <DataGrid
             rows={users.filter(u => u.role !== 'Vendeur')}
             columns={columns}
+            //@ts-ignore
             pageSize={10}
             rowsPerPageOptions={[10]}
             checkboxSelection

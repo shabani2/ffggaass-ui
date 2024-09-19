@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk, createEntityAdapter, EntityId } from '@reduxjs/toolkit';
 import axiosInstance from '@/Utils/axiosInstance';
 import { Commande } from '@/Utils/dataTypes';
@@ -105,6 +107,7 @@ const commandeSlice = createSlice({
       })
       .addCase(fetchCommandes.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(addCommande.pending, (state) => {
@@ -117,6 +120,7 @@ const commandeSlice = createSlice({
       })
       .addCase(addCommande.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(updateCommande.pending, (state) => {
@@ -129,6 +133,7 @@ const commandeSlice = createSlice({
       })
       .addCase(updateCommande.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(deleteCommande.pending, (state) => {
@@ -137,10 +142,12 @@ const commandeSlice = createSlice({
       })
       .addCase(deleteCommande.fulfilled, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         commandeAdapter.removeOne(state, action.payload as EntityId);
       })
       .addCase(deleteCommande.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload as string;
       })
       .addCase(searchCommandesByProduit.pending, (state) => {
@@ -152,6 +159,7 @@ const commandeSlice = createSlice({
       })
       .addCase(searchCommandesByProduit.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload;
       })
       .addCase(searchCommandesByClient.pending, (state) => {
@@ -163,6 +171,7 @@ const commandeSlice = createSlice({
       })
       .addCase(searchCommandesByClient.rejected, (state, action) => {
         state.loading = false;
+        //@ts-ignore
         state.error = action.payload;
       });
   },

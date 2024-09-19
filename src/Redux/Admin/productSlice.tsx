@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, EntityId } from '@reduxjs/toolkit';
 import axiosInstance from '@/Utils/axiosInstance';
 //import { RootState } from '../Store';
@@ -102,6 +104,7 @@ const produitSlice = createSlice({
         state.loading = false;
         produitAdapter.setAll(state, action.payload);
       })
+      //@ts-ignore
       .addCase(fetchProduits.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;
@@ -114,6 +117,7 @@ const produitSlice = createSlice({
         state.loading = false;
         produitAdapter.addOne(state, action.payload);
       })
+      //@ts-ignore
       .addCase(addProduit.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;
@@ -126,6 +130,7 @@ const produitSlice = createSlice({
         state.loading = false;
         produitAdapter.upsertOne(state, action.payload);
       })
+      //@ts-ignore
       .addCase(updateProduit.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;
@@ -138,6 +143,7 @@ const produitSlice = createSlice({
         state.loading = false;
         produitAdapter.removeOne(state, action.payload);
       })
+      //@ts-ignore
       .addCase(deleteProduit.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;

@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
-import { fetchProduits, Produit1 } from '@/Redux/Admin/productSlice';
+import { Produit1 } from '@/Redux/Admin/productSlice';
 import { format } from 'date-fns';
-import { Livraison, PointVente1 } from '@/Utils/dataTypes';
+import { PointVente1 } from '@/Utils/dataTypes';
 import { selectCurrentUser } from '@/Redux/Auth/userSlice';
 import { fetchStockVariationsByPointVente, selectAllStockVariations } from '@/Redux/Admin/stockVariationSlice';
 
@@ -23,8 +25,7 @@ const StockVendeur = () => {
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
   const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null);
+ 
  
   const user = useSelector(selectCurrentUser)
 

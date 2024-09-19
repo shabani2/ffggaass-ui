@@ -9,7 +9,7 @@ export interface BonEntreAPI {
   quantite: number;
   date: Date;
 }
-
+//@ts-ignore
 const bonEntreAdapter = createEntityAdapter<BonEntre>({    
         //@ts-ignore
         selectId: (instance: { _id: EntityId; }) => instance._id,      

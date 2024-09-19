@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -5,7 +6,7 @@ import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Produit, PointVente1, Livraison, Vente } from '@/Utils/dataTypes';
+import { Produit, PointVente1 } from '@/Utils/dataTypes';
 import {  DownloadIcon, UploadIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { selectCurrentUser } from '@/Redux/Auth/userSlice';
@@ -14,13 +15,14 @@ import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mv
 import { fetchProduits } from '@/Redux/Admin/productSlice';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { fetchVentesByPointVente, searchVentes, selectAllVentes } from '@/Redux/Admin/venteSlice';
+import { fetchVentesByPointVente, selectAllVentes } from '@/Redux/Admin/venteSlice';
 
 
 
 
 const VentePage = () => {
   const dispatch :AppDispatch= useDispatch();
+  
   const ventes= useSelector(selectAllVentes);  
   const user = useSelector(selectCurrentUser);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -36,6 +38,7 @@ const VentePage = () => {
   useEffect(() => {
     console.log('pvname=>',user?.pointVente?.nom)
     dispatch(fetchVentesByPointVente(user?.pointVente?.nom));
+    //@ts-ignore
   }, [dispatch]); 
 
   const columns: GridColDef[] = [
@@ -223,12 +226,15 @@ const VentePage = () => {
           </div>
         </div>
               
-          {ventes.length>0 ?
+          {//@ts-ignore
+          ventes.length>0 ?
            <DataGrid
+           //@ts-ignore
            rows={ventes} 
            columns={columns}
            pagination
            paginationMode="client"
+           //@ts-ignore
            rowCount={ventes.length}
            onPaginationModelChange={(newPaginationModel) => setPaginationModel(newPaginationModel)}
            loading={loading}

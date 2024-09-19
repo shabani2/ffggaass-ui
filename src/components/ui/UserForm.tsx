@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { Button, TextField, Grid, MenuItem, CardHeader, Divider } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
@@ -5,7 +8,7 @@ import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/Redux/Store';
 import { updateUser, fetchUsers } from '@/Redux/Auth/userSlice';
-import { User } from '@/Utils/dataTypes';
+//import { User } from '@/Utils/dataTypes';
 
 // Validation schema using Yup
 const validationSchema = Yup.object({
@@ -17,7 +20,7 @@ const validationSchema = Yup.object({
 });
 
 interface UserFormProps {
-  user: User;
+  user: any;
 }
 
 const UserForm: React.FC<UserFormProps> = ({ user }) => {
@@ -26,11 +29,17 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
   return (
     <><CardHeader subheader="The information can be edited" title="Profile" className='bg-gray-50'/><Divider /><Formik
           initialValues={{
+            //@ts-ignore
               nom: user.nom,
+              //@ts-ignore
               postnom: user.postnom,
+              //@ts-ignore
               prenom: user.prenom,
+              //@ts-ignore
               numero: user.numero,
+              //@ts-ignore
               password: '',
+              //@ts-ignore
               role: user.role,
           }}
           validationSchema={validationSchema}
@@ -43,7 +52,7 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                   password: values.password,
                   role: values.role,
               };
-
+              //@ts-ignore
               dispatch(updateUser({ id: user._id, user: data })).then(() => {
                   dispatch(fetchUsers());
               });

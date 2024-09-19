@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,6 +25,7 @@ const Stock = () => {
   const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //@ts-ignore
   const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null);
 
 

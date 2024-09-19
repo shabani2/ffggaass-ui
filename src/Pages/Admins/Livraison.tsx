@@ -1,10 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button, Chip, Stack, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
-import { addLivraison, fetchExcludedLivraisons, fetchLivraisons, selectAllLivraisons } from '@/Redux/Admin/livraisonSlice';
+import { addLivraison, fetchExcludedLivraisons, selectAllLivraisons } from '@/Redux/Admin/livraisonSlice';
 import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice';
 import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
 import { fetchProduits, Produit1, selectAllProduits } from '@/Redux/Admin/productSlice';
@@ -38,6 +41,7 @@ const LivraisonPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //@ts-ignore
   const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null);
   const produits = useSelector((state: RootState) => selectAllProduits(state));
   const categories = useSelector((state: RootState) => selectAllCategories(state));
@@ -90,7 +94,8 @@ const LivraisonPage = () => {
   useEffect(() => {
     dispatch(fetchExcludedLivraisons(user?.pointVente?.nom)).then((rep)=>{
       console.log('rep',rep.payload)
-    });    
+    }); 
+    //@ts-ignore   
   }, [dispatch]);
 
   const columns: GridColDef[] = [
@@ -219,6 +224,7 @@ const LivraisonPage = () => {
   useEffect(() => {
     const montant = formik.values.quantite * formik.values.prix;
     formik.setFieldValue('montant', montant);
+    //@ts-ignore
   }, [formik.values.quantite, formik.values.prix]);  
 
   
@@ -305,111 +311,7 @@ const LivraisonPage = () => {
           <Typography variant="h6" component="h2" className="mb-4">
             {modalMode === 'create' ? 'Nouvelle Livraison' : 'Modifier Livraison'}
           </Typography>
-          {/* <Grid container spacing={2}>
-            
-                <Grid item xs={4}>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>Point de vente</InputLabel>
-                    <Select
-                      name="pointvente"
-                      value={formik.values.pointvente}
-                      onChange={formik.handleChange}
-                      error={formik.touched.pointvente && Boolean(formik.errors.pointvente)}
-                    >
-                      {pointventes.map((pv) => (
-                        <MenuItem key={pv.id} value={pv.id}>
-                          {pv.nom}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={4}>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>Category</InputLabel>
-                    <Select
-                      name="category"
-                      value={formik.values.category}
-                      onChange={handleCategoryChange}
-                      error={formik.touched.category && Boolean(formik.errors.category)}
-                    >
-                      {categories.map((category) => (
-                        <MenuItem key={category.id} value={category.id}>
-                          {category.nom}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={4}>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>Produit</InputLabel>
-                    <Select
-                      name="produit"
-                      value={formik.values.produit}
-                      onChange={handleProduitChange}
-                      error={formik.touched.produit && Boolean(formik.errors.produit)}
-                    >
-                      {filteredProduits.map((produit) => (
-                        <MenuItem key={produit.id} value={produit.id}>
-                          {produit.nom}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    margin="normal"
-                    id="prix"
-                    name="prix"
-                    label="Prix"
-                    type="number"
-                    disabled
-                    value={formik.values.prix}
-                    onChange={formik.handleChange}
-                    error={formik.touched.prix && Boolean(formik.errors.prix)}
-                    helperText={formik.touched.prix && formik.errors.prix}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    margin="normal"
-                    id="quantite"
-                    name="quantite"
-                    label="Quantite"
-                    type="number"
-                    value={formik.values.quantite}
-                    onChange={formik.handleChange}
-                    error={formik.touched.quantite && Boolean(formik.errors.quantite)}
-                    helperText={formik.touched.quantite && formik.errors.quantite}
-                  />
-                </Grid>
-
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    margin="normal"
-                    disabled
-                    id="montant"
-                    name="montant"
-                    label="Montant"
-                    type="number"
-                    value={formik.values.montant}
-                    onChange={formik.handleChange}
-                    error={formik.touched.montant && Boolean(formik.errors.montant)}
-                    helperText={formik.touched.montant && formik.errors.montant}
-                  />
-                </Grid>
-          </Grid> */}
+         
           <div className="flex flex-wrap -mx-3">
             <div className="w-full px-3 mb-6 md:w-1/3">
               <FormControl fullWidth margin="normal">

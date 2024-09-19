@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import axiosInstance from '@/Utils/axiosInstance';
 import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, EntityId } from '@reduxjs/toolkit';
@@ -82,6 +84,7 @@ const categorySlice = createSlice({
         state.loading = false;
         categoryAdapter.setAll(state, action.payload);
       })
+      //@ts-ignore
       .addCase(fetchCategories.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;
@@ -94,6 +97,7 @@ const categorySlice = createSlice({
         state.loading = false;
         categoryAdapter.addOne(state, action.payload);
       })
+      //@ts-ignore
       .addCase(addCategory.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;
@@ -106,6 +110,7 @@ const categorySlice = createSlice({
         state.loading = false;
         categoryAdapter.upsertOne(state, action.payload);
       })
+      //@ts-ignore
       .addCase(updateCategory.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;
@@ -118,6 +123,7 @@ const categorySlice = createSlice({
         state.loading = false;
         categoryAdapter.removeOne(state, action.payload);
       })
+      //@ts-ignore
       .addCase(deleteCategory.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;

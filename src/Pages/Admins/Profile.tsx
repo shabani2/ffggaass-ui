@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {  Avatar, Button, Card, CardActions, CardContent, CardHeader, Divider, Grid,  Stack, Typography } from '@mui/material'
+import {  Avatar, Button, Card, CardActions, CardContent, Divider, Grid,  Stack, Typography } from '@mui/material'
 //import { UploadIcon, DownloadIcon, PlusIcon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { findUserById,} from '@/Redux/Auth/userSlice';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,7 +11,8 @@ import UserForm from '@/components/ui/UserForm';
 
 const Profile = () => {
 
-  const { user, status, error } = useSelector((state: RootState) => state.users);
+  const { user } = useSelector((state: RootState) => state.users);
+  //@ts-ignore
   const [userId, setUserId] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {

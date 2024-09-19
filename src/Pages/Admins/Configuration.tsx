@@ -1,5 +1,5 @@
 import ConfigOnglet from '@/components/ui/ConfigOnglet'
-import React from 'react'
+
 import { Outlet } from 'react-router-dom'
 
 const Configuration = () => {

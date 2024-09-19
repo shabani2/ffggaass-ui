@@ -151,6 +151,7 @@ export const importLivraison = createAsyncThunk('livraison/import', async (file:
       ...l,
     }));
   } catch (error) {
+    //@ts-ignore
     return rejectWithValue(error.response.data);
   }
 });

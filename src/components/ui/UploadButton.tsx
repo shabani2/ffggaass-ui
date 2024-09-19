@@ -8,7 +8,7 @@ import { fetchProduits } from '@/Redux/Admin/productSlice';
 import { fetchCategories } from '@/Redux/Admin/categorySlice';
 
 const UploadButton: React.FC = () => {
-  const dispatch:AppDispatch = useDispatch<AppDispatch>();
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const loading = useSelector((state: RootState) => state.mvtStock.loading);
   const error = useSelector((state: RootState) => state.mvtStock.error);
@@ -30,7 +30,24 @@ const UploadButton: React.FC = () => {
   };
 
   return (
-    
+    <div>
+      <input
+        type="file"
+        ref={inputRef}
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<UploadIcon />}
+        onClick={handleUploadClick}
+        disabled={loading}
+      >
+        {loading ? 'Uploading...' : 'Upload CSV'}
+      </Button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </div>
   );
 };
 
