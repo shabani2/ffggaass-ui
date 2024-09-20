@@ -3,7 +3,7 @@ const VITE_API_DEV = import.meta.env.VITE_API_DEV;
 const VITE_API_PROD = import.meta.env.VITE_API_PROD;
 
 const getApiUrl = (): string => {
-  const hostname = window.location.hostname;
+  const hostname = window.location.hostname; // Ne renvoie que le nom de domaine, pas le protocole ni les chemins
 
   switch (hostname) {
     case 'localhost':
@@ -11,8 +11,8 @@ const getApiUrl = (): string => {
       console.log('ffggaass is running on localhost!');
       return VITE_API_LOCAL; // Utilise l'API locale pour le développement local
 
-    case 'https://inaf-backend-510563b7750d.herokuapp.com/':
-    case 'https://inaf-vente.netlify.app/':
+    case 'inaf-backend-510563b7750d.herokuapp.com':
+    case 'inaf-vente.netlify.app':
       console.log('ffggaass is running on development!');
       return VITE_API_DEV; // Utilise l'API pour le développement
 
@@ -27,3 +27,4 @@ const getApiUrl = (): string => {
 };
 
 export default getApiUrl;
+
