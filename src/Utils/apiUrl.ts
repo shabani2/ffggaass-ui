@@ -8,9 +8,9 @@ const getApiUrl = (): string => {
       case '127.0.0.1:9091/api/ffggaass/':
         console.log('ffggaass is running on localhost !');
         return VITE_API_LOCAL;
-      case 'dgi.netlify.app':
-      case 'dev-dgi.web.app':
-        console.log('DGI is running on developement !');
+      case 'https://inaf-backend-510563b7750d.herokuapp.com/api/ffggaass/':
+      case 'dev-ffggaass-api.web.app':
+        console.log('ffggaass is running on developement !');
         return VITE_API_DEV;
       case 'dgi.243technologies.com':
         console.log('DGI is running on production !');
