@@ -11,7 +11,7 @@ const getApiUrl = (): string => {
       console.log('ffggaass is running on localhost!');
       return VITE_API_LOCAL; // Utilise l'API locale pour le développement local
 
-    case 'inaf-backend-510563b7750d.herokuapp.com':
+    case 'https://inaf-backend-510563b7750d.herokuapp.com/':
     case 'https://inaf-vente.netlify.app/':
       console.log('ffggaass is running on development!');
       return VITE_API_DEV; // Utilise l'API pour le développement
