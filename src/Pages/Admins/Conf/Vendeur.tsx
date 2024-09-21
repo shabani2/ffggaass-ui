@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Box from '@mui/material/Box'
@@ -13,7 +14,7 @@ import {
   GridActionsCellItem
 } from  '@mui/x-data-grid';
 
-import { CircularProgress, MenuItem, Modal, TextField } from '@mui/material';
+import { CircularProgress, Modal} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -24,19 +25,14 @@ import * as Yup from 'yup';
 
 //import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
-import { DownloadIcon, PlusIcon, SaveIcon, UploadIcon} from 'lucide-react';
+import { DownloadIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import { User } from '@/Utils/dataTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/Redux/Store';
-import { deleteUser, fetchUsers, registerUser, selectAllUsers, updateUser } from '@/Redux/Auth/userSlice';
+import { deleteUser, fetchUsers, registerVendeur, selectAllUsers, updateUser } from '@/Redux/Auth/userSlice';
 import { fetchPointVentes, selectAllPointVentes } from '@/Redux/Admin/pointVenteSlice';
 
 //import { Margin } from '@mui/icons-material';
-
-
-
-
-
 
 const validationSchema = Yup.object({
   nom: Yup.string().required('Nom est requis'),
@@ -62,8 +58,7 @@ const Vendeur = () => {
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([]);
 
   const users = useSelector((state: RootState) => selectAllUsers(state));
-  const pofSale = useSelector((state:RootState)=>selectAllPointVentes(state))
-  console.log('le pofsale====>',pofSale);
+  const pofSale = useSelector((state:RootState)=>selectAllPointVentes(state)) 
   const [selectedId,setSelectedId]=useState('');
  
   //
@@ -131,9 +126,6 @@ const Vendeur = () => {
   const addStatus = useSelector((state: RootState) => state.users.addStatus);
   const updateStatus = useSelector((state: RootState) => state.users.updateStatus);
   const deleteStatus = useSelector((state: RootState) => state.users.deleteStatus);
-  console.log( `tatuts=> ${addStatus}, ${deleteStatus}, ${updateStatus}, ${status}`)
-
-  console.log(status);
   useEffect(()=>{   
     
       dispatch(fetchUsers()).then(()=>{
@@ -160,23 +152,31 @@ const Vendeur = () => {
   return (
     <>
       <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Gestion des Vendeurs</Typography>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Import
-            </Button>
-            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Export
-            </Button>
-          </Stack>
-        </Stack>
-        <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={handleAddClick}>
-            Nouveau
-          </Button>
-        </div>
-      </Stack>
+  <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
+    <Typography variant="h5" sx={{ fontFamily: "'Helvetica Neue', Arial, sans-serif", fontWeight: 'bold' }}>
+      Gestion des Vendeurs
+    </Typography>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+      <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />} sx={{ fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+        Import
+      </Button>
+      <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />} sx={{ fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+        Export
+      </Button>
+    </Stack>
+  </Stack>
+  <div>
+    <Button
+      startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
+      className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      onClick={handleAddClick}
+      sx={{background : '#3B82F6',color :'white'}}
+    >
+      ajouter 
+    </Button>
+  </div>
+</Stack>
+
 
       {/* zone du tableau */}
       <div style={{ height: 400, width: '100%' }}>
@@ -199,168 +199,195 @@ const Vendeur = () => {
       )}
         
         <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '50%',
-            bgcolor: 'background.paper',
-            border: '2px solid #000',
-            boxShadow: 24,
-            p: 4,
-          }}
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
         >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            {isEditMode ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur'}
-          </Typography>
-          <Formik
-            initialValues={{
-              nom: clickedItem?.nom || '',
-              postnom: clickedItem?.postnom || '',
-              prenom: clickedItem?.prenom || '',
-              numero: clickedItem?.numero || '',
-              password: '',
-              role: clickedItem?.role || '',
-              pointVente: clickedItem?.pointVente?._id || '',
-              isEditMode: isEditMode,
-            }}
-            validationSchema={validationSchema}
-            onSubmit={(values) => {
-              const data = {                
-                nom: values.nom,
-                numero: values.numero,
-                password: values.password,
-                pointVenteId: values.pointVente,  // Assurez-vous que `pointVente` est de type `PointVente`
-                postnom: values.postnom,
-                prenom: values.prenom,
-                role: values.role
-              }
-               
-              isEditMode ?           
-               
-                dispatch(updateUser({id:selectedId,user:data})).then(()=>{
-                  dispatch(fetchUsers())
-                })
-                :
-                dispatch(registerUser(data)).then(()=>{
-                  dispatch(fetchUsers())
-                })             
-             
-                handleClose();
-                console.log( `statuts=> ${addStatus}, ${deleteStatus}, ${updateStatus}, ${status}`)
-              
-                
-            }}
-          >
-            {({ errors, touched }) => (
-              <Form>
-                <Field
-                  as={TextField}
-                  name="nom"
-                  label="Nom"
-                  variant="outlined"
-                  fullWidth
-                  error={touched.nom && !!errors.nom}
-                  helperText={touched.nom && errors.nom}
-                  sx={{ mb: 2, px: 1 }}
-                />
-                <Field
-                  as={TextField}
-                  name="postnom"
-                  label="Postnom"
-                  variant="outlined"
-                  fullWidth
-                  error={touched.postnom && !!errors.postnom}
-                  helperText={touched.postnom && errors.postnom}
-                  sx={{ mb: 2, px: 1 }}
-                />
-                <Field
-                  as={TextField}
-                  name="prenom"
-                  label="Prénom"
-                  variant="outlined"
-                  fullWidth
-                  error={touched.prenom && !!errors.prenom}
-                  helperText={touched.prenom && errors.prenom}
-                  sx={{ mb: 2, px: 1 }}
-                />
-                <Field
-                  as={TextField}
-                  name="numero"
-                  label="Numéro"
-                  variant="outlined"
-                  fullWidth
-                  error={touched.numero && !!errors.numero}
-                  helperText={touched.numero && errors.numero}
-                  sx={{ mb: 2, px: 1 }}
-                />
-                {!isEditMode && (
-                  <Field
-                    as={TextField}
-                    name="password"
-                    label="Mot de passe"
-                    type="password"
-                    variant="outlined"
-                    fullWidth
-                    error={touched.password && !!errors.password}
-                    helperText={touched.password && errors.password}
-                    sx={{ mb: 2, px: 1 }}
-                  />
-                )}
-                <Field
-                  as={TextField}
-                  name="role"
-                  label="Rôle"
-                  select
-                  variant="outlined"
-                  fullWidth
-                  error={touched.role && !!errors.role}
-                  helperText={touched.role && errors.role}
-                  sx={{ mb: 2, px: 1 }}
-                >
-                  <MenuItem value="Vendeur">Vendeur</MenuItem>
-                  
-                </Field>
-                <Field
-                  as={TextField}
-                  name="pointVente"
-                  label="Point de vente"
-                  select
-                  variant="outlined"
-                  fullWidth
-                  error={touched.pointVente && !!errors.pointVente}
-                  helperText={touched.pointVente && errors.pointVente}
-                  sx={{ mb: 2, px: 1 }}
-                >
-                  {pofSale.length > 0 && pofSale.map((pos) => (
-                      <MenuItem key={pos.id} value={pos.id}>
-                        {pos.nom}
-                      </MenuItem>
-                    ))}
-                  
-                  
-                </Field>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  startIcon={<SaveIcon />}
-                  sx={{ display: 'block', ml: 'auto', mt: 2 }}
-                >
-                  Sauvegarder
-                </Button>
-              </Form>
-            )}
-          </Formik>
-        </Box>
-      </Modal>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: '50%',
+      height: '70%', // Hauteur du modal à 70% de l'écran
+      bgcolor: 'background.paper',     
+      boxShadow: 24,
+      p: 4,
+      overflowY: 'auto', // Pour gérer le scroll si besoin
+    }}
+  >
+    <Typography id="modal-modal-title" variant="h6" component="h2">
+      {isEditMode ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur'}
+    </Typography>
+    <Formik
+      initialValues={{
+        nom: clickedItem?.nom || '',
+        postnom: clickedItem?.postnom || '',
+        prenom: clickedItem?.prenom || '',
+        numero: clickedItem?.numero || '',
+        password: '',
+        role: 'Vendeur',
+        pointVente: clickedItem?.pointVente?._id || '',
+        isEditMode: isEditMode,
+      }}
+      validationSchema={validationSchema}
+      onSubmit={(values) => {
+        const data = {
+          nom: values.nom,
+          numero: values.numero,
+          password: values.password,
+          pointVente: values.pointVente,
+          postnom: values.postnom,
+          prenom: values.prenom,
+          role: values.role,
+        };
+
+        console.log('Données envoyées au serveur :', data); // Affichage des données dans la console
+
+        if (isEditMode) {
+          dispatch(updateUser({ id: selectedId, user: data })).then(() => {
+            dispatch(fetchUsers());
+          });
+        } else {
+          dispatch(registerVendeur(data)).then(() => {
+            dispatch(fetchUsers());
+          });
+        }
+
+        handleClose();
+      }}
+    >
+      {({ errors, touched }) => (
+       <Form>
+       {/* Nom et Postnom sur une même ligne */}
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+         {/* Champ Nom */}
+         <div>
+           <label className="block text-sm font-medium text-gray-700">Nom</label>
+           <Field
+             name="nom"
+             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+             placeholder="Entrez votre nom"
+           />
+           {touched.nom && errors.nom && (
+             <div className="text-red-500 text-sm mt-1">{errors.nom}</div>
+           )}
+         </div>
+     
+         {/* Champ Postnom */}
+         <div>
+           <label className="block text-sm font-medium text-gray-700">Postnom</label>
+           <Field
+             name="postnom"
+             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+             placeholder="Entrez votre postnom"
+           />
+           {touched.postnom && errors.postnom && (
+             <div className="text-red-500 text-sm mt-1">{errors.postnom}</div>
+           )}
+         </div>
+       </div>
+     
+       {/* Prénom */}
+       <div className="mb-5">
+         <label className="block text-sm font-medium text-gray-700">Prénom</label>
+         <Field
+           name="prenom"
+           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+           placeholder="Entrez votre prénom"
+         />
+         {touched.prenom && errors.prenom && (
+           <div className="text-red-500 text-sm mt-1">{errors.prenom}</div>
+         )}
+       </div>
+     
+       {/* Numéro */}
+       <div className="mb-5">
+         <label className="block text-sm font-medium text-gray-700">Numéro</label>
+         <Field
+           name="numero"
+           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+           placeholder="Entrez votre numéro de téléphone"
+         />
+         {touched.numero && errors.numero && (
+           <div className="text-red-500 text-sm mt-1">{errors.numero}</div>
+         )}
+       </div>
+     
+       {/* Mot de passe (si non en mode édition) */}
+       {!isEditMode && (
+         <div className="mb-5">
+           <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
+           <Field
+             name="password"
+             type="password"
+             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+             placeholder="Entrez un mot de passe"
+           />
+           {touched.password && errors.password && (
+             <div className="text-red-500 text-sm mt-1">{errors.password}</div>
+           )}
+         </div>
+       )}
+     
+       {/* Rôle et Point de vente sur la même ligne */}
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+         {/* Champ Rôle */}
+         <div>
+  <label className="block text-sm font-medium text-gray-700">Rôle</label>
+  <Field
+    name="role"
+    as="input"
+    type="text"
+    
+    disabled
+    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-gray-100 sm:text-sm"
+  />
+  {touched.role && errors.role && (
+    <div className="text-red-500 text-sm mt-1">{errors.role}</div>
+  )}
+</div>
+
+     
+         {/* Champ Point de vente */}
+         <div>
+           <label className="block text-sm font-medium text-gray-700">Point de vente</label>
+           <Field
+             as="select"
+             name="pointVente"
+             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+           >
+            <option>choisir un point de vente</option>
+             {pofSale.length > 0 &&
+               pofSale.map((pos) => (
+                 <option key={pos.id} value={pos.id}>
+                   {pos.nom}
+                 </option>
+               ))}
+           </Field>
+           {touched.pointVente && errors.pointVente && (
+             <div className="text-red-500 text-sm mt-1">{errors.pointVente}</div>
+           )}
+         </div>
+       </div>
+     
+       {/* Bouton Submit avec Tailwind (design moderne) */}
+       <button
+         type="submit"
+         className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full mt-4"
+       >
+         Enregistrer
+       </button>
+     </Form>
+     
+      
+      )}
+    </Formik>
+  </Box>
+</Modal>
+
     </div>
     
     

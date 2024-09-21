@@ -58,6 +58,18 @@ export const registerUser = createAsyncThunk('users/register', async (userData: 
     return rejectWithValue(err.response?.data || err.message);
   }
 });
+export const registerVendeur = createAsyncThunk('vendeurs/register', async (userData: unknown, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/user', userData);
+    return response.data.map((pv: { _id: unknown; }) => ({
+      id: pv._id,
+      ...pv
+    }));
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(err.response?.data || err.message);
+  }
+});
 
 export const loginUser = createAsyncThunk('users/login', async (credentials: { numero: string; password: string }, { rejectWithValue }) => {
   try {
@@ -163,6 +175,18 @@ const userSlice = createSlice({
       userAdapter.addOne(state, action.payload);
     });
     builder.addCase(registerUser.rejected, (state, action) => {
+      state.addStatus = 'failed';
+      state.error = action.payload as string;
+    });
+    //vendeur registration
+    builder.addCase(registerVendeur.pending, (state) => {
+      state.addStatus = 'loading';
+    });
+    builder.addCase(registerVendeur.fulfilled, (state, action) => {
+      state.addStatus = 'succeeded';
+      userAdapter.addOne(state, action.payload);
+    });
+    builder.addCase(registerVendeur.rejected, (state, action) => {
       state.addStatus = 'failed';
       state.error = action.payload as string;
     });
