@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 
 const GeneraleForm: React.FC = () => {
@@ -18,7 +19,8 @@ const GeneraleForm: React.FC = () => {
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/ban-ts-comment
+ // @ts-expect-error
   const [fileInputKey, setFileInputKey] = useState(Date.now()); // Pour réinitialiser l'input
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
