@@ -9,7 +9,7 @@ import getApiUrl from "@/Utils/apiUrl";
 const FormGenerale = () => {
   const dispatch: AppDispatch = useDispatch();
   const general = useSelector(selectAllGenerales); // Sélectionne les données générales
-  const [fileInputKey, setFileInputKey] = useState(Date.now());
+  const [fileInputKey] = useState(Date.now());
   const apiUrl = getApiUrl();
   // Form state
   const [formData, setFormData] = useState({
