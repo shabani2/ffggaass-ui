@@ -12,7 +12,7 @@ import clientReducer from './Admin/clientSlice';
 import bonEntreReducer from './Admin/bonEntreSlice';
 import stockVariationReducer from './Admin/stockVariationSlice';
 import stockLocalReducer from './Admin/stockLocalSlice';
-
+import generaleReducer from './Admin/generalSlice';
 
 
 export const Store = configureStore({
@@ -29,7 +29,8 @@ export const Store = configureStore({
     clients : clientReducer,
     bonEntre:bonEntreReducer,
     stockVariation : stockVariationReducer,
-    stockLocal:stockLocalReducer
+    stockLocal:stockLocalReducer,
+    generale: generaleReducer,
    
   
   },

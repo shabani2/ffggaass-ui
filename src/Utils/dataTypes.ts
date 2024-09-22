@@ -115,3 +115,22 @@ export interface BonEntre {
 
 
 
+export interface General { 
+  denominationsociale: string;
+  numerorccm: string;
+  dateimmatriculation: string;
+  datedebutexploitation: string;
+  origine: string;
+  formejuridique: string;
+  capitalesociale: number;
+  duree: number;
+  sigle: string;
+  adressedusiege: string;
+  secteuractiviteohada: string;
+  activiteprincipaleohada: string;
+  logoentreprise: string; // Cela pourrait être une URL ou un chemin vers l'image
+}
+
+
+
+
