@@ -248,7 +248,7 @@ console.log(apiUrl)
       >
         {formData.logoentreprise ? (
          
-          <img src={`${apiUrl}${formData.logoentreprise}`} alt="Aperçu/" className="w-full h-full object-cover rounded-lg" />
+          <img src={`${apiUrl}/${formData.logoentreprise}`} alt="Aperçu/" className="w-full h-full object-cover rounded-lg" />
         ) : (
           <div className="flex flex-col items-center">
             <span className="text-gray-500">Cliquez ici pour uploader une image</span>
