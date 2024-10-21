@@ -142,97 +142,126 @@ const dispatch = useDispatch<AppDispatch>();
   // Exemple de données pour le dropdown
 
   return (
-  <Box sx={{ display: 'flex', width: '100vw', overflowX: 'hidden' }}>
-  <CssBaseline />
-  <AppBarStyled
-    position="fixed"
-    open={!isMobile && open}
-    sx={{
-      background: '#374151',
-      width: { xs: '100%', md: `calc(100% - ${open ? drawerWidth : 0}px)` },
-      transition: 'width 0.3s ease',
-    }}
-  >
-    <Toolbar>
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        onClick={handleDrawerToggle}
-        edge="start"
-        sx={{ mr: 2, display: { xs: 'block', md: 'none' } }}
+    <Box sx={{ display: 'flex', width: '100vw', overflowX: 'hidden' }}>
+      <CssBaseline />
+      <AppBarStyled
+        position="fixed"
+        open={!isMobile && open}
+        sx={{
+          background: '#374151',
+          width: { xs: '100%', md: `calc(100% - ${open ? drawerWidth : 0}px)` },
+          transition: 'width 0.3s ease',
+        }}
       >
-        <MenuIcon />
-      </IconButton>
-      <Typography variant="h6" noWrap component="div">
-        {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
-      </Typography>
-      <Box sx={{ flexGrow: 1 }} />
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        <Typography
-          variant="body2"
-          sx={{ lineHeight: 1, marginRight: '22px', display: { xs: 'none', md: 'block' } }}
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerToggle}
+            edge="start"
+            sx={{ mr: 2, display: { xs: 'block', md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+            {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
+          </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Typography
+              variant="body2"
+              sx={{ lineHeight: 1, marginRight: '22px', display: { xs: 'none', md: 'block' } }}
+            >
+              <Tooltip title={`${30} commandes en attente`}>
+                <IconButton aria-label="notifications">
+                  <Badge badgeContent={30} color="secondary">
+                    <FaBell size={32} className="text-gray-50" />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+            </Typography>
+            <Typography variant="h6" noWrap>
+              {`${user?.nom} ${user?.postnom}`}
+            </Typography>
+          </div>
+          <Button onClick={handleClick}>
+            <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
+          </Button>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+            <MenuItem>Role: {user?.role}</MenuItem>
+            <MenuItem>
+              Point de vente: {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout}>
+              <LogoutIcon /> Se déconnecter
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBarStyled>
+
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            backgroundColor: '#1f2937',
+          },
+        }}
+        variant={isMobile ? 'temporary' : 'persistent'}
+        anchor="left"
+        open={open}
+        onClose={handleDrawerToggle}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            p: 2,
+            ...theme.mixins.toolbar,
+          }}
         >
-          <Tooltip title={`${30} commandes en attente`}>
-            <IconButton aria-label="notifications">
-              <Badge badgeContent={30} color="secondary">
-                <FaBell size={32} className="text-gray-50" />
-              </Badge>
-            </IconButton>
-          </Tooltip>
-        </Typography>
-        <Typography variant="h6" noWrap>
-          {`${user?.nom} ${user?.postnom}`}
-        </Typography>
-      </div>
-      <Button onClick={handleClick}>
-        <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
-      </Button>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem>Role: {user?.role}</MenuItem>
-        <MenuItem>
-          Point de vente: {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
-        </MenuItem>
+          <IconButton onClick={handleDrawerToggle} className="text-white">
+            {theme.direction === 'ltr' ? <MenuIcon className="text-white" /> : <MenuIcon />}
+          </IconButton>
+        </Box>
         <Divider />
-        <MenuItem onClick={handleLogout}>
-          <LogoutIcon /> Se déconnecter
-        </MenuItem>
-      </Menu>
-    </Toolbar>
-  </AppBarStyled>
+        <Box sx={{ textAlign: 'center', p: 2, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ width: '76px', height: '76px', borderRadius: '50%', marginRight: '10px' }}
+          />
+          <Typography variant="h6" className="mr-5 text-white">
+            FFGGAASS
+          </Typography>
+        </Box>
+        <Divider />
+        <div className="flex-1">
+          {user?.role === 'Vendeur' ? <VendeurOnglet /> : <AdminOnglet />}
+        </div>
+        <div className="p-3 flex">
+          <h6 className="text-gray-400 p-5">Application réalisée par Inaf</h6>
+        </div>
+      </Drawer>
 
-  <Drawer
-    sx={{
-      width: drawerWidth,
-      flexShrink: 0,
-      '& .MuiDrawer-paper': {
-        width: drawerWidth,
-        boxSizing: 'border-box',
-        backgroundColor: '#1f2937',
-      },
-      display: { xs: 'block', md: 'none' }, // Cacher le Drawer sur petits écrans
-    }}
-    variant={isMobile ? 'temporary' : 'persistent'}
-    anchor="left"
-    open={open}
-    onClose={handleDrawerToggle}
-  >
-    {/* Contenu du Drawer */}
-  </Drawer>
+      <Main
+        open={!isMobile && open}
+        className="bg-white"
+        sx={{
+          minHeight: '100vh',
+          width: { xs: '100vw', md: `calc(100% - ${drawerWidth}px)` },
+          transition: 'width 0.3s ease',
+        }}
+      >
+        <DrawerHeader />
+        <Outlet />
+      </Main>
+    </Box>
 
-  <Main
-    open={!isMobile && open}
-    sx={{
-      flexGrow: 1,
-      p: 3,
-      minHeight: '100vh',
-      width: { xs: '100vw', md: `calc(100% - ${drawerWidth}px)` },
-      transition: 'width 0.3s ease',
-    }}
-  >
-    <DrawerHeader />
-    <Outlet />
-  </Main>
-</Box>
 
   );
 };
