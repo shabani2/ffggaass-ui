@@ -142,137 +142,108 @@ const dispatch = useDispatch<AppDispatch>();
   // Exemple de données pour le dropdown
 
   return (
-  
-    <Box sx={{ display: 'flex', minWidth: '100vw', overflowX: 'hidden' }}>
+    <Box sx={{ display: 'flex' , minWidth: '100vw'}}>
       <CssBaseline />
-
-      {/* AppBar */}
-      <AppBarStyled
-        position="fixed"
-        open={!isMobile && open}
-        sx={{ background: '#374151', width: { xs: '100%', md: `calc(100% - ${open ? drawerWidth : 0}px)` } }}
-      >
+      <AppBarStyled position="fixed" open={!isMobile && open} sx={{background:'#374151'}} >
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerToggle}
             edge="start"
-            sx={{ mr: 2, display: { xs: 'block', md: 'none' } }} // Toggle visible on small screens
+            sx={{ mr: 2 }}
           >
             <MenuIcon />
           </IconButton>
-
-          <Typography variant="h6" noWrap component="div">
+          
+         <Typography variant="h6" noWrap component="div">
             {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
           </Typography>
-
           <Box sx={{ flexGrow: 1 }} />
-
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <Typography
-              variant="body2"
-              sx={{ lineHeight: 1, marginRight: '22px', display: { xs: 'none', md: 'block' } }}
-            >
-              <Tooltip title={`${30} commandes en attente`}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-center' }}>
+          <Typography variant="body2" style={{ lineHeight: 1, margin : ' auto',marginRight:'22px' }} className=''>
+              <Tooltip title={`${30} commandes en attente`} className=''>
                 <IconButton aria-label="notifications">
-                  <Badge badgeContent={30} color="secondary">
-                    <FaBell size={32} className="text-gray-50" />
-                  </Badge>
+                    <Badge badgeContent={30} color="secondary">
+                        <FaBell size={32} className='text-gray-50' />
+                    </Badge>
                 </IconButton>
-              </Tooltip>
+            </Tooltip>
             </Typography>
-
             <Typography variant="h6" noWrap>
               {`${user?.nom} ${user?.postnom}`}
             </Typography>
-
-            <Button onClick={handleClick}>
-              <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
-            </Button>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-              <MenuItem>Role: {user?.role}</MenuItem>
-              <MenuItem>
-                Point de vente: {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
-              </MenuItem>
-              <Divider />
-              <MenuItem onClick={handleLogout}>
-                <LogoutIcon /> Se déconnecter
-              </MenuItem>
-            </Menu>
+           
           </div>
+        
+        <div>
+      <Button onClick={handleClick}>
+        {/* {selectedItem || 'Select an option'} */}
+        <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem>role : {user?.role}</MenuItem>
+        <MenuItem> point vente : {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}</MenuItem>
+        <Divider/>
+        <MenuItem onClick={handleLogout}><LogoutIcon /> se deconnecter</MenuItem>
+      </Menu>
+    </div>
         </Toolbar>
       </AppBarStyled>
-
-      {/* Drawer */}
-      <Drawer
-        sx={{
+     
+       <Drawer
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
           width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundColor: '#1f2937',
-          },
-        }}
-        variant={isMobile ? 'temporary' : 'persistent'}
-        anchor="left"
-        open={open}
-        onClose={handleDrawerToggle}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            ...theme.mixins.toolbar,
-          }}
-        >
-          <IconButton onClick={handleDrawerToggle} className="text-white">
-            {theme.direction === 'ltr' ? <MenuIcon className="text-white" /> : <MenuIcon />}
-          </IconButton>
-        </Box>
-
-        <Divider />
-
-        <Box sx={{ textAlign: 'center', p: 2, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <img
-            src={logo}
-            alt="Logo"
-            style={{ width: '76px', height: '76px', borderRadius: '50%', marginRight: '10px' }}
-          />
-          <Typography variant="h6" className="mr-5 text-white">
-            FFGGAASS
-          </Typography>
-        </Box>
-
-        <Divider />
-
-        <div className="flex-1">
-          {user?.role === 'Vendeur' ? <VendeurOnglet /> : <AdminOnglet />}
-        </div>
-
-        <div className="p-3 flex">
-          <h6 className="text-gray-400 p-5">Application réalisée par Inaf</h6>
-        </div>
-      </Drawer>
-
-      {/* Main content */}
-      <Main
-        open={!isMobile && open}
-        className="bg-white"
+          boxSizing: 'border-box',
+          backgroundColor: '#1f2937',
+        },
+      }}
+      variant={isMobile ? 'temporary' : 'persistent'}
+      anchor="left"
+      open={open}
+      onClose={handleDrawerToggle}
+    >
+      <Box
         sx={{
-          minHeight: '100vh',
-          width: { xs: '100vw', md: `calc(100% - ${drawerWidth}px)` },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          ...theme.mixins.toolbar,
         }}
       >
+        <IconButton onClick={handleDrawerToggle} className='text-white'>
+          {theme.direction === 'ltr' ? <MenuIcon className='text-white' /> : <MenuIcon />}
+        </IconButton>
+      </Box>
+      <Divider />
+      <Box sx={{ textAlign: 'center', p: 2, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <img src={logo} alt="Logo" style={{ width: '76px', height: '76px', borderRadius: '50%',marginRight:'10px' }} />
+        <Typography variant="h6" className='mr-5 text-white'>FFGGAASS</Typography>
+      </Box>
+      <Divider />
+      <div className='flex-1'>
+        {user?.role=='Vendeur' ? <VendeurOnglet/> : <AdminOnglet/>}
+        {/* <AdminOnglet/> */}
+
+      </div>
+      <div className='p-3 flex'>
+          <h6 className='text-gray-400 p-5'>Application realise par Inaf</h6>
+      </div>
+     
+    </Drawer>      
+      <Main open={!isMobile && open} className='bg-white ' sx={{minHeight:'100vh',width:`100%`,  padding:'0'}}>
         <DrawerHeader />
         <Outlet />
       </Main>
-    </Box>
-
-
+  </Box>
   );
 };
 
