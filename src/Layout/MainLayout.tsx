@@ -142,16 +142,15 @@ const dispatch = useDispatch<AppDispatch>();
   // Exemple de données pour le dropdown
 
   return (
-    <Box sx={{ display: 'flex', width: '100vw', overflowX: 'hidden' }}>
+  
+    <Box sx={{ display: 'flex', minWidth: '100vw', overflowX: 'hidden' }}>
       <CssBaseline />
+
+      {/* AppBar */}
       <AppBarStyled
         position="fixed"
         open={!isMobile && open}
-        sx={{
-          background: '#374151',
-          width: { xs: '100%', md: `calc(100% - ${open ? drawerWidth : 0}px)` },
-          transition: 'width 0.3s ease',
-        }}
+        sx={{ background: '#374151', width: { xs: '100%', md: `calc(100% - ${open ? drawerWidth : 0}px)` } }}
       >
         <Toolbar>
           <IconButton
@@ -159,14 +158,17 @@ const dispatch = useDispatch<AppDispatch>();
             aria-label="open drawer"
             onClick={handleDrawerToggle}
             edge="start"
-            sx={{ mr: 2, display: { xs: 'block', md: 'none' } }}
+            sx={{ mr: 2, display: { xs: 'block', md: 'none' } }} // Toggle visible on small screens
           >
             <MenuIcon />
           </IconButton>
+
           <Typography variant="h6" noWrap component="div">
             {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
           </Typography>
+
           <Box sx={{ flexGrow: 1 }} />
+
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Typography
               variant="body2"
@@ -180,26 +182,29 @@ const dispatch = useDispatch<AppDispatch>();
                 </IconButton>
               </Tooltip>
             </Typography>
+
             <Typography variant="h6" noWrap>
               {`${user?.nom} ${user?.postnom}`}
             </Typography>
+
+            <Button onClick={handleClick}>
+              <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
+            </Button>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+              <MenuItem>Role: {user?.role}</MenuItem>
+              <MenuItem>
+                Point de vente: {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleLogout}>
+                <LogoutIcon /> Se déconnecter
+              </MenuItem>
+            </Menu>
           </div>
-          <Button onClick={handleClick}>
-            <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
-          </Button>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-            <MenuItem>Role: {user?.role}</MenuItem>
-            <MenuItem>
-              Point de vente: {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleLogout}>
-              <LogoutIcon /> Se déconnecter
-            </MenuItem>
-          </Menu>
         </Toolbar>
       </AppBarStyled>
 
+      {/* Drawer */}
       <Drawer
         sx={{
           width: drawerWidth,
@@ -228,7 +233,9 @@ const dispatch = useDispatch<AppDispatch>();
             {theme.direction === 'ltr' ? <MenuIcon className="text-white" /> : <MenuIcon />}
           </IconButton>
         </Box>
+
         <Divider />
+
         <Box sx={{ textAlign: 'center', p: 2, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <img
             src={logo}
@@ -239,22 +246,25 @@ const dispatch = useDispatch<AppDispatch>();
             FFGGAASS
           </Typography>
         </Box>
+
         <Divider />
+
         <div className="flex-1">
           {user?.role === 'Vendeur' ? <VendeurOnglet /> : <AdminOnglet />}
         </div>
+
         <div className="p-3 flex">
           <h6 className="text-gray-400 p-5">Application réalisée par Inaf</h6>
         </div>
       </Drawer>
 
+      {/* Main content */}
       <Main
         open={!isMobile && open}
         className="bg-white"
         sx={{
           minHeight: '100vh',
           width: { xs: '100vw', md: `calc(100% - ${drawerWidth}px)` },
-          transition: 'width 0.3s ease',
         }}
       >
         <DrawerHeader />
