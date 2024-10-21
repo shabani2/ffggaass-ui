@@ -24,7 +24,8 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import { FaBell } from 'react-icons/fa';
 import { Badge,Tooltip } from '@mui/material';
 
-const drawerWidth = 350;
+const drawerWidth = { xs: 240, sm: 300, md: 320 };
+
 
 
 
