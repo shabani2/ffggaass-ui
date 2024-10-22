@@ -136,7 +136,7 @@ const dispatch = useDispatch<AppDispatch>();
   const handleLogout= ()=>{
     dispatch(logoutUser())
   }
-
+console.log('taille ecran : ',window.innerWidth)
 
   
   // Exemple de données pour le dropdown
@@ -188,6 +188,7 @@ const dispatch = useDispatch<AppDispatch>();
       >
         <MenuItem>role : {user?.role}</MenuItem>
         <MenuItem> point vente : {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}</MenuItem>
+        <MenuItem> Parametre</MenuItem>
         <Divider/>
         <MenuItem onClick={handleLogout}><LogoutIcon /> se deconnecter</MenuItem>
       </Menu>
