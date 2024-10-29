@@ -10,11 +10,11 @@ const InfoCard: React.FC<InfoCardProps> = ({ title, icon, amount }) => {
   return (
     <div className="w-full h-full p-4 bg-gray-700 rounded shadow">
       <div className="flex items-center justify-between">
-        <div className="w-[70%]">
+        <div className="w-[70vw]">
           <h3 className="text-xl font-semibold text-white">{title}</h3>
           <p className="mt-2 ml-6 text-2xl text-white">{amount}fc</p>
         </div>
-        <div className="w-[10%] text-right">
+        <div className="w-[10vw] text-right">
           <div className="text-5xl text-gray-500">{icon}</div>
         </div>
       </div>

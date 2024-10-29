@@ -77,16 +77,7 @@ const coreRoutes = [
     title: 'Stock',
     component: Stock,
   },
-  {
-    path: '/settings',
-    title: 'Configuration',
-    component: Configuration,
-  },
-  {
-    path: '/profile',
-    title: 'Profile',
-    component: Profile,
-  } 
+
 
 ];
 
@@ -164,6 +155,18 @@ export const vendeurRoute = [
 
 ]
 
+export const others = [
+  {
+    path: '/settings',
+    title: 'Configuration',
+    component: Configuration,
+  },
+  {
+    path: '/profile',
+    title: 'Profile',
+    component: Profile,
+  } 
+]
 
 const routes = [...coreRoutes];
 export default routes;

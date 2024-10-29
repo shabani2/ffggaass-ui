@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Drawer, Box, CssBaseline, Divider, Avatar, useTheme, useMediaQuery, Button, Menu, MenuItem } from '@mui/material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Menu as MenuIcon } from '@mui/icons-material';
+import { Inventory, Menu as MenuIcon, Person, Settings } from '@mui/icons-material';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { styled } from '@mui/material/styles';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 // import { makeStyles} from '@mui/styles'
 import logo from '@/images/ai-generated-8201392_1280.png'
 import avatar1 from '@/images/man-156584_1280.png'
@@ -24,7 +24,8 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import { FaBell } from 'react-icons/fa';
 import { Badge,Tooltip } from '@mui/material';
 
-const drawerWidth = 350;
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+const drawerWidth = 300;
 
 
 
@@ -32,7 +33,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
-  // width: '100%',
+   width: '100vw',
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -57,7 +58,7 @@ const AppBarStyled = styled(AppBar, {
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
+    width: `calc(100vw - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
@@ -90,7 +91,7 @@ const [userId, setUserId] = useState<string>('');
 //@ts-ignore
 const dispatch = useDispatch<AppDispatch>();
 //@ts-ignore
-//const user1 = useSelector(selectCurrentUser)
+const navigate = useNavigate();
 
   
   // const classes = useStyles();
@@ -136,13 +137,20 @@ const dispatch = useDispatch<AppDispatch>();
   const handleLogout= ()=>{
     dispatch(logoutUser())
   }
+
+  const handleProfil= ()=>{
+    navigate('/profile')
+  }
+  const handleConfig= ()=>{
+    navigate('/settings')
+  }
 console.log('taille ecran : ',window.innerWidth)
 
   
   // Exemple de données pour le dropdown
 
   return (
-    <Box sx={{ display: 'flex' , minWidth: '100vw'}}>
+    <Box sx={{ display: 'flex' , Width: '100vw'}}>
       <CssBaseline />
       <AppBarStyled position="fixed" open={!isMobile && open} sx={{background:'#374151'}} >
         <Toolbar>
@@ -186,9 +194,10 @@ console.log('taille ecran : ',window.innerWidth)
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem>role : {user?.role}</MenuItem>
-        <MenuItem> point vente : {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}</MenuItem>
-        <MenuItem> Parametre</MenuItem>
+        <MenuItem><AdminPanelSettingsIcon /> {user?.role}</MenuItem>
+        <MenuItem><Inventory /> {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}</MenuItem>
+        <MenuItem onClick={handleConfig}><Settings /> Parametre</MenuItem>
+        <MenuItem onClick={handleProfil}><Person /> Profil</MenuItem>
         <Divider/>
         <MenuItem onClick={handleLogout}><LogoutIcon /> se deconnecter</MenuItem>
       </Menu>

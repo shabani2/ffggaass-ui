@@ -1,7 +1,7 @@
 //import { Suspense, useState } from 'react'
 //import { Loader, LogIn } from 'lucide-react'
 import { Routes, Route } from 'react-router-dom'
-import routes, { configRoute, vendeurRoute } from './Routes/AppRoute'
+import routes, { configRoute, others, vendeurRoute } from './Routes/AppRoute'
 import MainLayout from './Layout/MainLayout'
 import Login from './Pages/Auth/Login'
 import Home from './Pages/Admins/Home'
@@ -97,6 +97,23 @@ function App() {
                 />
               );
             })}
+
+            {
+              others.map((routes,index)=>{
+                const { path, component: Component } = routes; 
+                return (
+                  <Route
+                    key={index}
+                    path={path}
+                    element={
+                      <Suspense fallback={<Loader />}>
+                        <Component />
+                      </Suspense>
+                    }
+                  />
+                );
+              })
+            }
           </Route>
         </Route>
         
