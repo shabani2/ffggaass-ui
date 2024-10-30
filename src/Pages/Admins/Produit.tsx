@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import { Button, IconButton, Modal, Box, TextField, MenuItem, Select, FormControl, InputLabel, Stack, Typography } from '@mui/material';
+import { Button, IconButton, Modal, Box, Stack } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import { fetchProduits, addProduit, updateProduit, deleteProduit, selectAllProduits } from '@/Redux/Admin/productSlice';

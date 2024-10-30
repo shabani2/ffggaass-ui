@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Button, IconButton, Stack } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -180,11 +180,11 @@ const VentePage = () => {
 
   return (
   <>
-     <div className='p-[2rem] w-full'>
+     <div className='w-full p-[2rem]'>
      <div>
         <Stack direction="row" spacing={3}>
           <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-            <h4 className='text-3xl text-bold'>Gestion de Vente</h4>            
+            <h4 className='text-bold text-3xl'>Gestion de Vente</h4>            
           </Stack>
           <div>            
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -216,13 +216,12 @@ const VentePage = () => {
       <div style={{ width: '95%',maxHeight:'500px'}}>
         
         <Box >
-        <div className='flex flex-row justify-between w-full pt-5 pb-2'>
+        <div className='flex w-full flex-row justify-between pb-2 pt-5'>
           <div className='w-2/5'>
             <h5 className='text-2xl text-blue-500'>fiche de vente journaliere</h5>
           </div>
-          <div className='flex justify-end w-1/5'>
-            {/* <button className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-500 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
+          <div className='flex w-1/5 justify-end'>
+            {/* <button className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
               Nouveau livraison
             </button> */}
           </div>

@@ -39,7 +39,7 @@ const Admin = () => {
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([]);
   const users = useSelector((state: RootState) => selectAllUsers(state));
   const [selectedId, setSelectedId] = useState('');
-  
+ //@ts-ignore 
   const handleAddClick = () => {
     setClickedItem(null);
     setIsEditMode(false);
@@ -129,9 +129,7 @@ const Admin = () => {
         </Stack>
         <div>
         <button
-  className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white 
-             hover:bg-blue-500 focus:outline-none focus:ring-2 
-             focus:ring-blue-500 rounded-lg"
+  className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
              onClick={()=>setOpen(true)}
 >
   <PlusIcon fontSize="var(--icon-fontSize-md)" className="inline-block" />

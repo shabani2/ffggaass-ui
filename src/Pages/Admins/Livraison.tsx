@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Chip, Stack, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
+import { Box, Button, Chip, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import { addLivraison, fetchExcludedLivraisons, selectAllLivraisons } from '@/Redux/Admin/livraisonSlice';
@@ -230,9 +230,9 @@ const LivraisonPage = () => {
   
 
   return (
-    <div className='min-w-10/12 p-7 bg-gray-200'>
+    <div className='min-w-10/12 bg-gray-200 p-7'>
      
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <h4 className="text-2xl">Gestion de livraisons</h4>
         
         <div className="flex items-center space-x-4">
@@ -267,11 +267,11 @@ const LivraisonPage = () => {
 
 
       <Box>
-        <div className='flex items-center justify-between mb-4'>
-          <h6 className='text-blue-500 text-xl'>Tableau de bon de livraisons</h6>
+        <div className='mb-4 flex items-center justify-between'>
+          <h6 className='text-xl text-blue-500'>Tableau de bon de livraisons</h6>
           <button
             onClick={() => handleOpenModal('create')}
-            className="px-6 py-2 text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md transition duration-300 rounded-lg"
+            className="rounded-lg bg-blue-600 px-6 py-2 text-white shadow-md transition duration-300 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
           >
             Nouveau livraison
           </button>
@@ -306,7 +306,7 @@ const LivraisonPage = () => {
         aria-describedby="modal-description"
       >
         <Box
-          className="max-w-lg p-6 mx-auto mt-10 bg-white rounded"
+          className="mx-auto mt-10 max-w-lg rounded bg-white p-6"
           sx={{
             position: 'absolute',
             top: '40%',
@@ -322,8 +322,8 @@ const LivraisonPage = () => {
             {modalMode === 'create' ? 'Nouvelle Livraison' : 'Modifier Livraison'}
           </Typography>
          
-          <div className="flex flex-wrap -mx-3">
-            <div className="w-full px-3 mb-6 md:w-1/3">
+          <div className="-mx-3 flex flex-wrap">
+            <div className="mb-6 w-full px-3 md:w-1/3">
               <FormControl fullWidth margin="normal">
                 <InputLabel>Point de vente</InputLabel>
                 <Select
@@ -331,7 +331,7 @@ const LivraisonPage = () => {
                   value={formik.values.pointvente}
                   onChange={formik.handleChange}
                   error={formik.touched.pointvente && Boolean(formik.errors.pointvente)}
-                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"
                 >
                   {pointventes.map((pv) => (
                     <MenuItem key={pv.id} value={pv.id}>
@@ -342,7 +342,7 @@ const LivraisonPage = () => {
               </FormControl>
             </div>
 
-            <div className="w-full px-3 mb-6 md:w-1/3">
+            <div className="mb-6 w-full px-3 md:w-1/3">
               <FormControl fullWidth margin="normal">
                 <InputLabel>Category</InputLabel>
                 <Select
@@ -350,7 +350,7 @@ const LivraisonPage = () => {
                   value={formik.values.category}
                   onChange={handleCategoryChange}
                   error={formik.touched.category && Boolean(formik.errors.category)}
-                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"
                 >
                   {categories.map((category) => (
                     <MenuItem key={category.id} value={category.id}>
@@ -361,7 +361,7 @@ const LivraisonPage = () => {
               </FormControl>
             </div>
 
-            <div className="w-full px-3 mb-6 md:w-1/3">
+            <div className="mb-6 w-full px-3 md:w-1/3">
               <FormControl fullWidth margin="normal">
                 <InputLabel>Produit</InputLabel>
                 <Select
@@ -369,7 +369,7 @@ const LivraisonPage = () => {
                   value={formik.values.produit}
                   onChange={handleProduitChange}
                   error={formik.touched.produit && Boolean(formik.errors.produit)}
-                  className="bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"
                 >
                   {filteredProduits.map((produit) => (
                     <MenuItem key={produit.id} value={produit.id}>
@@ -380,7 +380,7 @@ const LivraisonPage = () => {
               </FormControl>
             </div>
 
-            <div className="w-full px-3 mb-6 md:w-1/3">
+            <div className="mb-6 w-full px-3 md:w-1/3">
               <TextField
                 fullWidth
                 margin="normal"
@@ -399,7 +399,7 @@ const LivraisonPage = () => {
               />
             </div>
 
-            <div className="w-full px-3 mb-6 md:w-1/3">
+            <div className="mb-6 w-full px-3 md:w-1/3">
               <TextField
                 fullWidth
                 margin="normal"
@@ -417,7 +417,7 @@ const LivraisonPage = () => {
               />
             </div>
 
-            <div className="w-full px-3 mb-6 md:w-1/3">
+            <div className="mb-6 w-full px-3 md:w-1/3">
               <TextField
                 fullWidth
                 margin="normal"
@@ -436,17 +436,17 @@ const LivraisonPage = () => {
               />
             </div>
           </div>
-          <Box className="flex justify-end mt-4">
+          <Box className="mt-4 flex justify-end">
             <button 
            // onClick={handleSave}
            type='submit'
-            className="px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
+            className="m-3 rounded-lg bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-500"
             >
               {modalMode === 'create' ? 'Créer' : 'Modifier'}
             </button>
             <button 
             onClick={handleCloseModal}
-            className="px-4 py-2 m-3 text-white bg-red-600 rounded-lg shadow-md bg--600 hover:bg-red-500">
+            className="bg--600 m-3 rounded-lg bg-red-600 px-4 py-2 text-white shadow-md hover:bg-red-500">
               Annuler
             </button>
           </Box>

@@ -3,12 +3,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Stack, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select, Chip } from '@mui/material';
+import { Box, Stack, Typography, Chip } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch } from '@/Redux/Store';
 import { fetchCommandes, addCommande, selectAllCommandes } from '@/Redux/Admin/commandeSlice';
-import { fetchProduits, selectAllProduits } from '@/Redux/Admin/productSlice';
-import { fetchClients, selectAllClients } from '@/Redux/Admin/clientSlice';
+import { fetchProduits } from '@/Redux/Admin/productSlice';
+import { fetchClients } from '@/Redux/Admin/clientSlice';
 import { format } from 'date-fns';
 import { Commande, Client } from '@/Utils/dataTypes';
 import { useFormik } from 'formik';
@@ -28,17 +28,15 @@ const validationSchema = yup.object({
 const CommandePage = () => {
   const dispatch: AppDispatch = useDispatch();
   const commandes = useSelector(selectAllCommandes);
-  const produits = useSelector(selectAllProduits);
-  const clients = useSelector(selectAllClients);
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   //@ts-ignore
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   //@ts-ignore
   const [selectedCommande, setSelectedCommande] = useState<Commande | null>(null);
   //@ts-ignore
   const [filteredProduits, setFilteredProduits] = useState<Produit[]>([]);
-  const [selectedProduit, setSelectedProduit] = useState<Produit| null>(null);
+  const [selectedProduit] = useState<Produit| null>(null);
   //@ts-ignore
   const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
 
@@ -107,41 +105,32 @@ const CommandePage = () => {
   const handleOpenModal = (mode: 'create' | 'edit', commande?: Commande) => {
     setModalMode(mode);
     setSelectedCommande(commande || null);
-    setIsModalOpen(true);
+    
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    
     setSelectedCommande(null);
   };
 
 
-  const handleProduitChange = (event: { target: { value: any } }) => {
-    const produitId = event.target.value as string;
-    const selected = produits.find((produit) => produit?._id === produitId);
-    //@ts-ignore
-    setSelectedProduit(selected || null);
-    formik.setFieldValue('produit', produitId);
-    formik.setFieldValue('prix', selected?.prix);
-  };
 
   useEffect(() => {
     const montant = formik.values.quantite * formik.values.prix;
     formik.setFieldValue('montant', montant);
     //@ts-ignore
-  }, [formik.values.quantite, formik.values.prix]);
+  }, [formik.values.quantite, formik.values.prix, formik]);
 
   return (
-    <div className='w-full h-screen p-8 bg-gray-200'>
+    <div className='h-screen w-full bg-gray-200 p-8'>
       <Stack direction="row" spacing={3} mb={3}>
         <Typography variant="h4">Gestion de commandes</Typography>
       </Stack>
 
       <Box>
-        <div className='flex items-center justify-between mb-4'>
+        <div className='mb-4 flex items-center justify-between'>
           <Typography variant="h5" className='text-blue-500'>Tableau des commandes</Typography>
-          <button className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-500 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg" onClick={() => handleOpenModal('create')}>
+          <button className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500" onClick={() => handleOpenModal('create')}>
             Nouvelle commande
           </button>
         </div>

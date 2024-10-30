@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import { Button, Modal, Box, TextField, Typography, Stack, IconButton } from '@mui/material';
+import { Button, Box, Stack, IconButton } from '@mui/material';
 import { AppDispatch, RootState } from '@/Redux/Store';
 import {
   fetchClients,
@@ -10,6 +10,7 @@ import {
   updateClient,
   deleteClient,
   //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   searchClients,
   selectAllClients,
 } from '@/Redux/Admin/clientSlice';
@@ -21,17 +22,17 @@ import { DownloadIcon, UploadIcon } from 'lucide-react';
 
 
 
-const style = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+// const style = {
+//   position: 'absolute' as const,
+//   top: '50%',
+//   left: '50%',
+//   transform: 'translate(-50%, -50%)',
+//   width: 400,
+//   bgcolor: 'background.paper',
+//   border: '2px solid #000',
+//   boxShadow: 24,
+//   p: 4,
+// };
 
 
 
@@ -133,7 +134,7 @@ const ClientPage = () => {
     <div className='min-w-10/12 p-7'>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <h4 className='text-2xl text-bold'>Gestion de Clients</h4>
+          <h4 className='text-bold text-2xl'>Gestion de Clients</h4>
         </Stack>
         <div>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -152,9 +153,9 @@ const ClientPage = () => {
    
       <div style={{ height: 500, width: '99%' }} className='mt-[25px]'>
           <Box>
-            <Box className='flex justify-between mb-1'>
-              <h6 className=' text-2xl text-bold text-blue-500' >Liste des Clients</h6>
-              <button className='px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500'  onClick={handleOpen}>
+            <Box className='mb-1 flex justify-between'>
+              <h6 className='text-bold text-2xl text-blue-500' >Liste des Clients</h6>
+              <button className='m-3 rounded-lg bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-500'  onClick={handleOpen}>
                 Ajouter Client
               </button>
               
@@ -177,8 +178,8 @@ const ClientPage = () => {
 
       {open && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-lg">
+      <h2 className="mb-4 text-xl font-semibold">
         {selectedClient ? 'Modifier Client' : 'Ajouter Client'}
       </h2>
 
@@ -194,11 +195,10 @@ const ClientPage = () => {
             type="text"
             value={formik.values.nom}
             onChange={formik.handleChange}
-            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`h-12 w-full border border-gray-300 bg-white px-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
           {formik.touched.nom && formik.errors.nom && (
-            <p className="text-red-500 text-sm mt-1">{formik.errors.nom}</p>
+            <p className="mt-1 text-sm text-red-500">{formik.errors.nom}</p>
           )}
         </div>
 
@@ -213,11 +213,10 @@ const ClientPage = () => {
             type="text"
             value={formik.values.postnom}
             onChange={formik.handleChange}
-            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`h-12 w-full border border-gray-300 bg-white px-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
           {formik.touched.postnom && formik.errors.postnom && (
-            <p className="text-red-500 text-sm mt-1">{formik.errors.postnom}</p>
+            <p className="mt-1 text-sm text-red-500">{formik.errors.postnom}</p>
           )}
         </div>
 
@@ -232,11 +231,10 @@ const ClientPage = () => {
             type="text"
             value={formik.values.prenom}
             onChange={formik.handleChange}
-            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`h-12 w-full border border-gray-300 bg-white px-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
           {formik.touched.prenom && formik.errors.prenom && (
-            <p className="text-red-500 text-sm mt-1">{formik.errors.prenom}</p>
+            <p className="mt-1 text-sm text-red-500">{formik.errors.prenom}</p>
           )}
         </div>
 
@@ -251,11 +249,10 @@ const ClientPage = () => {
             type="text"
             value={formik.values.numero}
             onChange={formik.handleChange}
-            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`h-12 w-full border border-gray-300 bg-white px-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
           {formik.touched.numero && formik.errors.numero && (
-            <p className="text-red-500 text-sm mt-1">{formik.errors.numero}</p>
+            <p className="mt-1 text-sm text-red-500">{formik.errors.numero}</p>
           )}
         </div>
 
@@ -270,29 +267,26 @@ const ClientPage = () => {
             type="text"
             value={formik.values.adresse}
             onChange={formik.handleChange}
-            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`h-12 w-full border border-gray-300 bg-white px-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
           {formik.touched.adresse && formik.errors.adresse && (
-            <p className="text-red-500 text-sm mt-1">{formik.errors.adresse}</p>
+            <p className="mt-1 text-sm text-red-500">{formik.errors.adresse}</p>
           )}
         </div>
 
         {/* Boutons */}
-        <div className="col-span-2 flex justify-end space-x-4 mt-6">
+        <div className="col-span-2 mt-6 flex justify-end space-x-4">
           <button
             type="button"
             onClick={handleClose}
-            className="px-6 py-2 border border-gray-300 text-gray-700 bg-white 
-                       hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+            className="rounded-lg border border-gray-300 bg-white px-6 py-2 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Annuler
           </button>
 
           <button
             type="submit"
-            className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-500 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+            className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {selectedClient ? 'Mettre à jour' : 'Ajouter'}
           </button>
