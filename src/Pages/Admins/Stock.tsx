@@ -66,7 +66,7 @@ useEffect(()=>{
   return (
     <div className='w-full h-screen p-8 bg-gray-200'>
       <Stack direction="row" spacing={3} mb={3}>
-        <Typography variant="h4">Gestion du Stock dans le Depot central</Typography>
+        <Typography variant="h4">Gestion de Stock</Typography>
         <Stack direction="row" spacing={1} alignItems="center">
          
         </Stack>
@@ -74,7 +74,7 @@ useEffect(()=>{
 
       <Box>
         <div className='flex items-center justify-between mb-4'>
-          <Typography variant="h5" className='text-blue-500'>Resume du stock</Typography>
+          <Typography variant="h5" className='text-blue-500'>Situation du stock general</Typography>
           
         </div>
 

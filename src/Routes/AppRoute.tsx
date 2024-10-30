@@ -42,7 +42,7 @@ const coreRoutes = [
   },
   {
     path: '/caisse',
-    title: 'Bon de livraison',
+    title: 'Decaissement',
     component: Caisse,
   },
   {

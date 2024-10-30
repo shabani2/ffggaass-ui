@@ -117,7 +117,7 @@ const Admin = () => {
     <>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Gestion des administrateursg</Typography>
+          <h5 className='text-bold text-2xl'>Gestion des administrateursg</h5>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
               Import
@@ -128,9 +128,16 @@ const Admin = () => {
           </Stack>
         </Stack>
         <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={handleAddClick}>
-            Nouveau
-          </Button>
+        <button
+  className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white 
+             hover:bg-blue-500 focus:outline-none focus:ring-2 
+             focus:ring-blue-500 rounded-lg"
+             onClick={()=>setOpen(true)}
+>
+  <PlusIcon fontSize="var(--icon-fontSize-md)" className="inline-block" />
+  <span>Nouveau</span>
+</button>
+
         </div>
       </Stack>
 

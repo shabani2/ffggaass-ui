@@ -16,7 +16,7 @@ import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
     'Produit': <Category />,
     'Fiche de Livraisons': <LocalShipping />,
     'Bon d\'entre': <ReceiptIcon />,
-    'Bon de livraison': <Store />,
+    'Decaissement': <Store />,
     'Stock': <Inventory />,
     'Configuration': <Settings />,
     'Profile': <Person />,

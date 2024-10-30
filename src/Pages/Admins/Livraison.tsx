@@ -230,16 +230,19 @@ const LivraisonPage = () => {
   
 
   return (
-    <div className='w-full h-screen p-8 bg-gray-200'>
-      <Stack direction="row" spacing={3} mb={3}>
-        <Typography variant="h4">Gestion de livraisons</Typography>
-        <Stack direction="row" spacing={1} alignItems="center">
+    <div className='min-w-10/12 p-7 bg-gray-200'>
+     
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-2xl">Gestion de livraisons</h4>
+        
+        <div className="flex items-center space-x-4">
           <input
             type="file"
             ref={inputRef}
             style={{ display: 'none' }}
             onChange={handleFileChange}
           />
+          
           <Button
             color="inherit"
             startIcon={<UploadIcon />}
@@ -248,8 +251,10 @@ const LivraisonPage = () => {
           >
             Upload
           </Button>
+
           {loading && <p>Loading...</p>}
           {error && <p>Error: {error}</p>}
+
           <Button
             color="inherit"
             startIcon={<DownloadIcon />}
@@ -257,15 +262,20 @@ const LivraisonPage = () => {
           >
             Export
           </Button>
-        </Stack>
-      </Stack>
+        </div>
+      </div>
+
 
       <Box>
         <div className='flex items-center justify-between mb-4'>
-          <Typography variant="h5" className='text-blue-500'>Tableau de bon de livraisons</Typography>
-          <Button variant="contained" color="primary" onClick={() => handleOpenModal('create')}>
+          <h6 className='text-blue-500 text-xl'>Tableau de bon de livraisons</h6>
+          <button
+            onClick={() => handleOpenModal('create')}
+            className="px-6 py-2 text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md transition duration-300 rounded-lg"
+          >
             Nouveau livraison
-          </Button>
+          </button>
+
         </div>
 
         {livraisons.length > 0 ? (

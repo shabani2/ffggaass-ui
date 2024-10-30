@@ -204,10 +204,10 @@ const Caisse: React.FC = () => {
              
               <Box component="form" onSubmit={formik.handleSubmit} sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
-                    <Grid item xs={9}>
+                    <Grid item xs={8}>
                     <h2 className="mb-4 text-2xl font-semibold text-gray-700">Sélection des Produits</h2>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={4}>
                     <Box >
                       <button  className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500" type='submit'>
                         Ajouter le produit
@@ -305,13 +305,109 @@ const Caisse: React.FC = () => {
 
               
             </Box>  
+
+{/* <Box component="form" onSubmit={formik.handleSubmit} sx={{ flexGrow: 1 }}>
+  <Grid container spacing={2}>
+    <Grid item xs={9}>
+      <h2 className="mb-6 text-2xl font-light text-gray-800">Sélection des Produits</h2>
+    </Grid>
+    <Grid item xs={3}>
+      <Box>
+        <button 
+          type="submit" 
+          className="w-full h-10 rounded-md p-2 text-white bg-blue-700 border border-gray-300 shadow hover:bg-blue-500 transition duration-300"
+        >
+          Ajouter le produit
+        </button>
+      </Box>
+    </Grid>
+  </Grid>
+
+  <Grid container spacing={2}>
+    <Grid item xs={4}>
+      <div>
+        <label className="block mb-1 text-sm font-medium text-gray-700" htmlFor="category">Category</label>
+        <select
+          id="category"
+          name="category"
+          value={formik.values.category}
+          onChange={handleCategoryChange}
+          className="w-full h-12 px-3 border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.nom}
+            </option>
+          ))}
+        </select>
+      </div>
+    </Grid>
+
+    <Grid item xs={4}>
+      <div>
+        <label className="block mb-1 text-sm font-medium text-gray-700" htmlFor="produit">Produit</label>
+        <select
+          id="produit"
+          name="produit"
+          value={formik.values.produit}
+          onChange={handleProduitChange}
+          className="w-full h-12 px-3 border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {filteredProduits.map((produit) => (
+            <option key={produit.id} value={produit.id}>
+              {produit.nom}
+            </option>
+          ))}
+        </select>
+      </div>
+    </Grid>
+
+    <Grid item xs={4}>
+      <div>
+        <label className="block mb-1 text-sm font-medium text-gray-700" htmlFor="prix">Prix</label>
+        <input
+          type="number"
+          id="prix"
+          name="prix"
+          value={formik.values.prix}
+          readOnly
+          className="w-full h-12 px-3 border border-gray-300 bg-white text-gray-700 focus:outline-none"
+        />
+      </div>
+    </Grid>
+
+    <Grid item xs={4}>
+      <div>
+        <label className="block mb-1 text-sm font-medium text-gray-700" htmlFor="quantite">Quantité</label>
+        <input
+          type="number"
+          id="quantite"
+          name="quantite"
+          value={formik.values.quantite}
+          onChange={formik.handleChange}
+          className="w-full h-12 px-3 border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+    </Grid>
+
+    <Grid item xs={4}>
+      <div>
+        <label className="block mb-1 text-sm font-medium text-gray-700" htmlFor="montant">Montant</label>
+        <input
+          type="number"
+          id="montant"
+          name="montant"
+          value={formik.values.montant}
+          disabled
+          className="w-full h-12 px-3 border border-gray-300 bg-white text-gray-700 focus:outline-none"
+        />
+      </div>
+    </Grid>
+  </Grid>
+</Box> */}
+
             </div>
-            {/* <button
-              onClick={addProduct}
-              className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
-            >
-              Ajouter le Produit
-            </button> */}
+           
           
 
           {/* Products List */}

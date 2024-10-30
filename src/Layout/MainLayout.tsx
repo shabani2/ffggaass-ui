@@ -234,8 +234,8 @@ console.log('taille ecran : ',window.innerWidth)
         </IconButton>
       </Box>
       <Divider />
-      <Box sx={{ textAlign: 'center', p: 2, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        <img src={logo} alt="Logo" style={{ width: '76px', height: '76px', borderRadius: '50%',marginRight:'10px' }} />
+      <Box sx={{ textAlign: 'center', p: 1, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <img src={logo} alt="Logo" style={{ width: '64px', height: '64px', borderRadius: '50%',marginRight:'10px' }} />
         <Typography variant="h6" className='mr-5 text-white'>FFGGAASS</Typography>
       </Box>
       <Divider />

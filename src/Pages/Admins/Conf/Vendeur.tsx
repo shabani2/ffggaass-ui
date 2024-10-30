@@ -166,14 +166,14 @@ const Vendeur = () => {
     </Stack>
   </Stack>
   <div>
-    <Button
-      startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
-      className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={handleAddClick}
-      sx={{background : '#3B82F6',color :'white'}}
+    <button
+     className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white 
+     hover:bg-blue-500 focus:outline-none focus:ring-2 
+     focus:ring-blue-500 rounded-lg"  onClick={handleAddClick}
+    
     >
-      ajouter 
-    </Button>
+     <PlusIcon fontSize="var(--icon-fontSize-md)" /> ajouter 
+    </button>
   </div>
 </Stack>
 

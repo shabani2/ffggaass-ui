@@ -36,9 +36,9 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
+  bgcolor: 'background.paper',  
   boxShadow: 24,
+  borderRadius : '10px',
   p: 4,
 };
 
@@ -148,17 +148,17 @@ const Produit: React.FC = () => {
   return (
 
     <>
-    <div className='min-w-10/12 p-7'>
+    <div className='min-w-6/12 p-7'>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Gestion de Produit</Typography>
+          <h3 className='text-2xl font-bold ' >Gestion de Produit</h3>
         </Stack>
         <div>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
+            <Button className='text-lg' color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-sm)" />}>
               Import
             </Button>
-            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}>
+            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-sm)" />}>
               Export
             </Button>
           </Stack>
@@ -171,11 +171,16 @@ const Produit: React.FC = () => {
       <div style={{ height: 500, width: '99%' }} className='mt-[25px]'> 
         <Box>
           <Box className='flex justify-between'>
-            <Typography className='m-3 text-4xl text-blue-500' sx={{fontSize:'2rem',margin:'3 0'}}>Liste de produits</Typography>
+            <h4 className='m-3 text-xl text-blue-500' >Liste de produits</h4>
             <div>
-                <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={() => handleOpenModal()}>
-                  Nouveau
-                </Button>
+            <button
+  className="flex items-center bg-blue-500 text-white font-semibold py-2 px-4 rounded shadow hover:bg-blue-600 transition duration-200 ease-in-out"
+  onClick={() => handleOpenModal()}
+>
+  <PlusIcon className="w-5 h-5 mr-2" />
+  Nouveau
+</button>
+
             </div>
                 
           </Box>
@@ -194,62 +199,100 @@ const Produit: React.FC = () => {
         </Box>  
         
         <Modal open={modalOpen} onClose={handleCloseModal}>
-          <Box sx={style}>
-            <Typography sx={{margin:2}}>{selectedProduct? 'Modifier Produit' : 'Ajouter Produit'}</Typography>
-            <form onSubmit={formik.handleSubmit}>
-            <FormControl fullWidth margin="normal">
-                <InputLabel id="category-label">Category</InputLabel>
-                <Select
-                  labelId="category-label"
+          <Box sx={style}>           
+            <h6 className="text-gl text-blue-800 mb-5 text-center">{selectedProduct? 'Modifier Produit' : 'Ajouter Produit'}</h6>
+            <form onSubmit={formik.handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <select
+                  id="category"
                   name="category"
                   value={formik.values.category}
                   onChange={formik.handleChange}
-                  error={formik.touched.category && Boolean(formik.errors.category)}
+                  className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 ${
+                    formik.touched.category && formik.errors.category ? 'border-red-500' : ''
+                  }pl-2 h-10`} // Hauteur ajustée
                 >
+                  <option>choisir une categorie...</option>
                   {categories.map((category) => (
-                    <MenuItem key={category.id} value={category.id}>
+                    <option key={category.id} value={category.id}>
                       {category.nom}
-                    </MenuItem>
+                    </option>
                   ))}
-                </Select>
-              </FormControl>
-              <TextField
-                name="nom"
-                label="Nom"
-                value={formik.values.nom}
-                onChange={formik.handleChange}
-                error={formik.touched.nom && Boolean(formik.errors.nom)}
-                helperText={formik.touched.nom && formik.errors.nom}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                name="prix"
-                label="Prix"
-                type="number"
-                value={formik.values.prix}
-                onChange={formik.handleChange}
-                error={formik.touched.prix && Boolean(formik.errors.prix)}
-                helperText={formik.touched.prix && formik.errors.prix}
-                fullWidth
-                margin="normal"
-              />
-               <TextField
-                name="prixVente"
-                label="PrixVente"
-                type="number"
-                value={formik.values.prixVente}
-                onChange={formik.handleChange}
-                error={formik.touched.prix && Boolean(formik.errors.prix)}
-                helperText={formik.touched.prix && formik.errors.prix}
-                fullWidth
-                margin="normal"
-              />
-             
-              <Button type="submit" variant="contained" color="primary" fullWidth>
-                {selectedProduct ? 'Update' : 'Add'}
-              </Button>
-            </form>
+                </select>
+                {formik.touched.category && formik.errors.category && (
+                  <p className="mt-1 text-sm text-red-600">{formik.errors.category}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="nom" className="block text-sm font-medium text-gray-700">
+                  Nom
+                </label>
+                <input
+                  id="nom"
+                  name="nom"
+                  type="text"
+                  value={formik.values.nom}
+                  onChange={formik.handleChange}
+                  className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 ${
+                    formik.touched.nom && formik.errors.nom ? 'border-red-500' : ''
+                  } pl-2 h-10`} // Hauteur ajustée
+                />
+                {formik.touched.nom && formik.errors.nom && (
+                  <p className="mt-1 text-sm text-red-600">{formik.errors.nom}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="prix" className="block text-sm font-medium text-gray-700">
+                  Prix
+                </label>
+                <input
+                  id="prix"
+                  name="prix"
+                  type="number"
+                  value={formik.values.prix}
+                  onChange={formik.handleChange}
+                  className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 ${
+                    formik.touched.prix && formik.errors.prix ? 'border-red-500' : ''
+                  } pl-2 h-10`} // Hauteur ajustée
+                />
+                {formik.touched.prix && formik.errors.prix && (
+                  <p className="mt-1 text-sm text-red-600">{formik.errors.prix}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="prixVente" className="block text-sm font-medium text-gray-700">
+                  Prix Vente
+                </label>
+                <input
+                  id="prixVente"
+                  name="prixVente"
+                  type="number"
+                  value={formik.values.prixVente}
+                  onChange={formik.handleChange}
+                  className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 ${
+                    formik.touched.prixVente && formik.errors.prixVente ? 'border-red-500' : ''
+                  } pl-2 h-10`} // Hauteur ajustée
+                />
+                {formik.touched.prixVente && formik.errors.prixVente && (
+                  <p className="mt-1 text-sm text-red-600">{formik.errors.prixVente}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md shadow hover:bg-blue-600 transition duration-200"
+              >
+                {selectedProduct ? 'modifier' : 'Ajouter'}
+              </button>
+</form>
+
+
           </Box>
         </Modal>
       </div>

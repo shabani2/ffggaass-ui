@@ -145,9 +145,13 @@ const PointVente: React.FC = () => {
           </Stack>
         </Stack>
         <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={handleOpen}>
-            Nouveau
-          </Button>
+          <button
+           className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white 
+           hover:bg-blue-500 focus:outline-none focus:ring-2 
+           focus:ring-blue-500 rounded-lg"
+          onClick={handleOpen}>
+          <PlusIcon fontSize="var(--icon-fontSize-md)" />  Nouveau
+          </button>
         </div>
    </Stack>
     

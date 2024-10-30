@@ -133,14 +133,14 @@ const ClientPage = () => {
     <div className='min-w-10/12 p-7'>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Gestion de Clients</Typography>
+          <h4 className='text-2xl text-bold'>Gestion de Clients</h4>
         </Stack>
         <div>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
+            <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-sm)" />}>
               Import
             </Button>
-            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}>
+            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-sm)" />}>
               Export
             </Button>
           </Stack>
@@ -152,11 +152,11 @@ const ClientPage = () => {
    
       <div style={{ height: 500, width: '99%' }} className='mt-[25px]'>
           <Box>
-            <Box className='flex justify-between mb-3'>
-              <Typography className='m-3 text-4xl text-blue-500' sx={{fontSize:'2rem',margin:'3 0'}}>Liste des Clients</Typography>
-              <Button variant="contained" color="primary" onClick={handleOpen}>
+            <Box className='flex justify-between mb-1'>
+              <h6 className=' text-2xl text-bold text-blue-500' >Liste des Clients</h6>
+              <button className='px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500'  onClick={handleOpen}>
                 Ajouter Client
-              </Button>
+              </button>
               
               </Box>
             
@@ -175,88 +175,133 @@ const ClientPage = () => {
       </div>
       
 
-      <Modal open={open} onClose={handleClose}>
-        <Box  sx={style}   
-        >
-          <Typography variant="h6" gutterBottom>
-            {selectedClient ? 'Modifier Client' : 'Ajouter Client'}
-          </Typography>    
-            
-              <form onSubmit={formik.handleSubmit}>
-                <TextField
-                  
-                  fullWidth
-                  label="Nom"
-                  name="nom"
-                  onChange={formik.handleChange}
-                  value={formik.values.nom}
-                  variant="outlined"
-                  margin="normal"
-                  error={formik.touched.nom && Boolean(formik.errors.nom)}
-                  helperText={formik.touched.nom && formik.errors.nom}
-                />
-                <TextField
-                 
-                  fullWidth
-                  label="Postnom"
-                  name="postnom"
-                  variant="outlined"
-                  margin="normal"
-                  onChange={formik.handleChange}
-                  value={formik.values.postnom}       
-                 
-                  error={formik.touched.postnom && Boolean(formik.errors.postnom)}
-                  helperText={formik.touched.postnom && formik.errors.postnom}
-                />
-                <TextField
-                 
-                  fullWidth
-                  label="Prénom"
-                  name="prenom"
-                  onChange={formik.handleChange}
-                  value={formik.values.prenom}
-                  variant="outlined"
-                  margin="normal"
-                  error={formik.touched.prenom && Boolean(formik.errors.prenom)}
-                  helperText={formik.touched.prenom && formik.errors.prenom}
-                />
-                 <TextField
-                  
-                  fullWidth
-                  label="numero"
-                  name="numero"
-                  onChange={formik.handleChange}
-                  value={formik.values.numero}
-                  variant="outlined"
-                  margin="normal"
-                  error={formik.touched.numero && Boolean(formik.errors.numero)}
-                  helperText={formik.touched.numero && formik.errors.numero}
-                />
-                <TextField
-                  
-                  fullWidth
-                  label="adresse"
-                  name="adresse"
-                  onChange={formik.handleChange}
-                  value={formik.values.adresse}
-                  variant="outlined"
-                  margin="normal"
-                  error={formik.touched.adresse && Boolean(formik.errors.adresse)}
-                  helperText={formik.touched.adresse && formik.errors.adresse}
-                />
-                <Box display="flex" justifyContent="space-between" mt={2}>
-                  <Button onClick={handleClose} color="secondary">
-                    Annuler
-                  </Button>
-                  <Button type="submit" variant="contained" color="primary">
-                    {selectedClient ? 'Mettre à jour' : 'Ajouter'}
-                  </Button>
-                </Box>
-              </form>
-          
-          
-        </Box>
-      </Modal>
+      {open && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
+      <h2 className="text-xl font-semibold mb-4">
+        {selectedClient ? 'Modifier Client' : 'Ajouter Client'}
+      </h2>
+
+      <form onSubmit={formik.handleSubmit} className="grid grid-cols-2 gap-4">
+        {/* Champ Nom */}
+        <div>
+          <label htmlFor="nom" className="block text-sm font-medium text-gray-700">
+            Nom
+          </label>
+          <input
+            id="nom"
+            name="nom"
+            type="text"
+            value={formik.values.nom}
+            onChange={formik.handleChange}
+            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          />
+          {formik.touched.nom && formik.errors.nom && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.nom}</p>
+          )}
+        </div>
+
+        {/* Champ Postnom */}
+        <div>
+          <label htmlFor="postnom" className="block text-sm font-medium text-gray-700">
+            Postnom
+          </label>
+          <input
+            id="postnom"
+            name="postnom"
+            type="text"
+            value={formik.values.postnom}
+            onChange={formik.handleChange}
+            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          />
+          {formik.touched.postnom && formik.errors.postnom && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.postnom}</p>
+          )}
+        </div>
+
+        {/* Champ Prénom */}
+        <div>
+          <label htmlFor="prenom" className="block text-sm font-medium text-gray-700">
+            Prénom
+          </label>
+          <input
+            id="prenom"
+            name="prenom"
+            type="text"
+            value={formik.values.prenom}
+            onChange={formik.handleChange}
+            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          />
+          {formik.touched.prenom && formik.errors.prenom && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.prenom}</p>
+          )}
+        </div>
+
+        {/* Champ Numéro */}
+        <div>
+          <label htmlFor="numero" className="block text-sm font-medium text-gray-700">
+            Numéro
+          </label>
+          <input
+            id="numero"
+            name="numero"
+            type="text"
+            value={formik.values.numero}
+            onChange={formik.handleChange}
+            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          />
+          {formik.touched.numero && formik.errors.numero && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.numero}</p>
+          )}
+        </div>
+
+        {/* Champ Adresse */}
+        <div className="col-span-2">
+          <label htmlFor="adresse" className="block text-sm font-medium text-gray-700">
+            Adresse
+          </label>
+          <input
+            id="adresse"
+            name="adresse"
+            type="text"
+            value={formik.values.adresse}
+            onChange={formik.handleChange}
+            className={`w-full h-12 px-3 border border-gray-300 bg-white focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          />
+          {formik.touched.adresse && formik.errors.adresse && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.adresse}</p>
+          )}
+        </div>
+
+        {/* Boutons */}
+        <div className="col-span-2 flex justify-end space-x-4 mt-6">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="px-6 py-2 border border-gray-300 text-gray-700 bg-white 
+                       hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+          >
+            Annuler
+          </button>
+
+          <button
+            type="submit"
+            className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-500 
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+          >
+            {selectedClient ? 'Mettre à jour' : 'Ajouter'}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
     </Box>
       
     </div>

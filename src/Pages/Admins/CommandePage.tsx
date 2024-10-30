@@ -140,9 +140,10 @@ const CommandePage = () => {
       <Box>
         <div className='flex items-center justify-between mb-4'>
           <Typography variant="h5" className='text-blue-500'>Tableau des commandes</Typography>
-          <Button variant="contained" color="primary" onClick={() => handleOpenModal('create')}>
+          <button className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-500 
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg" onClick={() => handleOpenModal('create')}>
             Nouvelle commande
-          </Button>
+          </button>
         </div>
 
         {commandes.length > 0 ? (
@@ -160,106 +161,7 @@ const CommandePage = () => {
       </Box>
 
       {/* Modal for creating/editing a Commande */}
-      <Modal open={isModalOpen} onClose={handleCloseModal}>
-        <Box
-          className="max-w-lg p-6 mx-auto mt-10 bg-white rounded"
-          sx={{
-            position: 'absolute',
-            top: '40%',
-            left: '50%',
-            transform: 'translate(-40%, -50%)',
-            width: '90%',
-            maxWidth: '700px',
-          }}
-          component='form' onSubmit={formik.handleSubmit}
-        >
-          <Typography variant="h6" component="h2" className="mb-4">
-            {modalMode === 'create' ? 'Nouvelle Commande' : 'Modifier Commande'}
-          </Typography>
-
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Client</InputLabel>
-            <Select
-              name="client"
-              value={formik.values.client}
-              onChange={formik.handleChange}
-              error={formik.touched.client && Boolean(formik.errors.client)}
-            >
-              {clients.map((client) => (
-                <MenuItem key={client._id} value={client._id}>
-                  {client.nom}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Produit</InputLabel>
-            <Select
-              name="produit"
-              value={formik.values.produit}
-              onChange={handleProduitChange}
-              error={formik.touched.produit && Boolean(formik.errors.produit)}
-            >
-              {produits.map((produit) => (
-                <MenuItem key={produit._id} value={produit._id}>
-                  {produit.nom}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            fullWidth
-            margin="normal"
-            id="quantite"
-            name="quantite"
-            label="Quantité"
-            type="number"
-            value={formik.values.quantite}
-            onChange={formik.handleChange}
-            error={formik.touched.quantite && Boolean(formik.errors.quantite)}
-            helperText={formik.touched.quantite && formik.errors.quantite}
-          />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            id="prix"
-            name="prix"
-            label="Prix"
-            type="number"
-            value={formik.values.prix}
-            onChange={formik.handleChange}
-            error={formik.touched.prix && Boolean(formik.errors.prix)}
-            helperText={formik.touched.prix && formik.errors.prix}
-            InputProps={{ readOnly: true }}
-          />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            id="montant"
-            name="montant"
-            label="Montant"
-            type="number"
-            value={formik.values.montant}
-            onChange={formik.handleChange}
-            error={formik.touched.montant && Boolean(formik.errors.montant)}
-            helperText={formik.touched.montant && formik.errors.montant}
-            InputProps={{ readOnly: true }}
-          />
-
-          <Stack direction="row" spacing={2} mt={2}>
-            <Button type="submit" variant="contained" color="primary">
-              {modalMode === 'create' ? 'Ajouter' : 'Enregistrer'}
-            </Button>
-            <Button onClick={handleCloseModal} variant="outlined" color="secondary">
-              Annuler
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
+     
       <ToastContainer />
     </div>
   );

@@ -184,7 +184,7 @@ const VentePage = () => {
      <div>
         <Stack direction="row" spacing={3}>
           <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-            <Typography variant="h4">Gestion de Vente</Typography>            
+            <h4 className='text-3xl text-bold'>Gestion de Vente</h4>            
           </Stack>
           <div>            
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -201,13 +201,13 @@ const VentePage = () => {
                   onClick={handleUploadClick}
                   disabled={loading}
                 >
-                  Upload
+                  importer
                 </Button>
                 {loading && <p>Loading...</p>}
                 {error && <p>Error: {error}</p>}
               </div>
               <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />} onClick={() => handleExport('xlsx')}>
-                Export
+                Exporter
               </Button>
             </Stack>
         </div>
@@ -218,12 +218,13 @@ const VentePage = () => {
         <Box >
         <div className='flex flex-row justify-between w-full pt-5 pb-2'>
           <div className='w-2/5'>
-            <h1 className='text-3xl text-blue-500'>fiche de vente journaliere</h1>
+            <h5 className='text-2xl text-blue-500'>fiche de vente journaliere</h5>
           </div>
           <div className='flex justify-end w-1/5'>
-            <Button variant="contained" color="primary">
+            {/* <button className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-500 
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
               Nouveau livraison
-            </Button>
+            </button> */}
           </div>
         </div>
               

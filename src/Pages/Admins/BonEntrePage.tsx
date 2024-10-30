@@ -88,27 +88,7 @@ const BonEntrePage = () => {
       width: 200,
       renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
     },
-    // {
-    //   field: 'actions',
-    //   headerName: 'Actions',
-    //   width: 100,
-    //   renderCell: (params) => (
-    //     <>
-    //       <IconButton
-    //         color="primary"
-    //         // onClick={() => handleEditClick(params.row as MvtStock)}
-    //       >
-    //         <EditIcon />
-    //       </IconButton>
-    //       <IconButton
-    //         color="secondary"
-    //         onClick={() => handleDelete(params.row.id)}
-    //       >
-    //         <DeleteIcon />
-    //       </IconButton>
-    //     </>
-    //   ),
-    // },
+   
   ];
 
   const formik = useFormik({
@@ -230,7 +210,7 @@ const BonEntrePage = () => {
      <div>
         <Stack direction="row" spacing={3}>
           <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-            <Typography variant="h4">Gestion d'entre en stock</Typography>            
+            <h4 className='text-2xl'>Gestion d'entre en stock</h4>            
           </Stack>
           <div>            
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -267,16 +247,17 @@ const BonEntrePage = () => {
         <Box >
         <div className='flex flex-row justify-between w-full pt-5 pb-2'>
           <div className='w-2/5'>
-            <h1 className='text-3xl text-blue-500'>Tableau de bon d'entree en stock</h1>
+            <h6 className='text-xl text-blue-500'>Tableau de bon d'entree en stock</h6>
           </div>
           <div className='flex justify-end w-1/5'>
-            <Button 
-              variant="contained" color="primary"
+            <button 
+            className='flex items-center bg-blue-500 text-white font-semibold py-2 px-4 rounded shadow hover:bg-blue-600 transition duration-200 ease-in-out'
+             
               onClick={()=>handleOpenModal('create')}
               >
               
-              Nouvel entre
-            </Button>
+              Nouveau
+            </button>
           </div>
         </div>
               
@@ -426,7 +407,7 @@ const BonEntrePage = () => {
            type='submit'
             className="px-4 py-2 m-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-500"
             >
-              {modalMode === 'create' ? 'Créer' : 'Modifier'}
+              {modalMode === 'create' ? 'Ajouter' : 'Modifier'}
             </button>
             <button 
             onClick={handleCloseModal}
