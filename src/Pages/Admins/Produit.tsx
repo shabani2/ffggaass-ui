@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { Button, IconButton, Modal, Box, Stack } from '@mui/material';
@@ -10,6 +10,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { EntityId } from '@reduxjs/toolkit';
 import { DownloadIcon, PlusIcon, UploadIcon } from 'lucide-react';
+import { exportMvtStock, fetchMvtStocks, importMvtStock } from '@/Redux/Admin/mvtStockSlice';
 
 interface Category {
   
@@ -107,11 +108,43 @@ const Produit: React.FC = () => {
     setSelectedProduct(null);
     formik.resetForm();
   };
-
+ 
   const handleDelete = (id: EntityId) => {
     dispatch(deleteProduit(id as string)).then(() => {
       dispatch(fetchProduits());
     });
+  };
+
+  const error = useSelector((state: RootState) => state.livraison.error);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleUploadClick = () => {
+    if (inputRef.current) {
+      inputRef.current.click();
+    }
+  };
+
+  const handleExport = (format: 'csv' | 'xlsx') => {
+    dispatch(exportMvtStock(format)).then((action) => {
+      if (action.meta.requestStatus === 'fulfilled') {
+        const url = window.URL.createObjectURL(new Blob([action.payload]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `mvtStock.${format}`);
+        document.body.appendChild(link);
+        link.click();
+      }
+    });
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      dispatch(importMvtStock(file));
+      dispatch(fetchMvtStocks());
+      dispatch(fetchProduits());
+      dispatch(fetchCategories());
+    }
   };
 
   const columns: GridColDef[] = [
@@ -151,16 +184,38 @@ const Produit: React.FC = () => {
     <div className='min-w-6/12 p-7'>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <h3 className='text-2xl font-bold ' >Gestion de Produit</h3>
+          <h3 className='text-2xl font-bold' >Gestion de Produit</h3>
         </Stack>
         <div>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button className='text-lg' color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-sm)" />}>
-              Import
-            </Button>
-            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-sm)" />}>
-              Export
-            </Button>
+          <div className="flex items-center space-x-4">
+          <input
+            type="file"
+            ref={inputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          
+          <Button
+            color="inherit"
+            startIcon={<UploadIcon />}
+            onClick={handleUploadClick}
+            disabled={loading}
+          >
+            Upload
+          </Button>
+
+          {loading && <p>Loading...</p>}
+          {error && <p>Error: {error}</p>}
+
+          <Button
+            color="inherit"
+            startIcon={<DownloadIcon />}
+            onClick={() => handleExport('xlsx')}
+          >
+            Export
+          </Button>
+        </div>
           </Stack>
         </div>
           
@@ -174,10 +229,10 @@ const Produit: React.FC = () => {
             <h4 className='m-3 text-xl text-blue-500' >Liste de produits</h4>
             <div>
             <button
-  className="flex items-center bg-blue-500 text-white font-semibold py-2 px-4 rounded shadow hover:bg-blue-600 transition duration-200 ease-in-out"
+  className="flex items-center rounded bg-blue-500 px-4 py-2 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-600"
   onClick={() => handleOpenModal()}
 >
-  <PlusIcon className="w-5 h-5 mr-2" />
+  <PlusIcon className="mr-2 h-5 w-5" />
   Nouveau
 </button>
 
@@ -200,7 +255,7 @@ const Produit: React.FC = () => {
         
         <Modal open={modalOpen} onClose={handleCloseModal}>
           <Box sx={style}>           
-            <h6 className="text-gl text-blue-800 mb-5 text-center">{selectedProduct? 'Modifier Produit' : 'Ajouter Produit'}</h6>
+            <h6 className="text-gl mb-5 text-center text-blue-800">{selectedProduct? 'Modifier Produit' : 'Ajouter Produit'}</h6>
             <form onSubmit={formik.handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700">
@@ -286,7 +341,7 @@ const Produit: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md shadow hover:bg-blue-600 transition duration-200"
+                className="w-full rounded-md bg-blue-500 px-4 py-2 font-semibold text-white shadow transition duration-200 hover:bg-blue-600"
               >
                 {selectedProduct ? 'modifier' : 'Ajouter'}
               </button>
@@ -305,3 +360,5 @@ const Produit: React.FC = () => {
 };
 
 export default Produit;
+
+

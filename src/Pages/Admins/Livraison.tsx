@@ -143,17 +143,7 @@ const LivraisonPage = () => {
     //   ),
     // },
   ];
-  //console.log('user pv name',user?.pointVente?.nom)
-
-  // const handleDelete = (id: string) => {
-  //   dispatch(deleteLivraison((id))).then(()=>{
-  //    // dispatch(fetchLivraisons())
-  //   // console.log('rep',rep.payload)
-  //     dispatch(fetchCategories());
-  //     dispatch(fetchProduits());
-  //     dispatch(fetchPointVentes())
-  //   })
-  // };
+  
 
   const handleUploadClick = () => {
     if (inputRef.current) {
