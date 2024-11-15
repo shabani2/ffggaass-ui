@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 
 
@@ -19,14 +21,21 @@ const Home = () => {
   const dispatch: AppDispatch = useDispatch();
 // const stockVariation = useSelector((state:RootState)=>selectAllStockVariations(state))
  // const stockVariationsWithMontants = useSelector(selectStockVariationWithMontants);
-  const { totalMontantLivre, totalMontantVendu, difference } = useSelector(selectMontantsTotal);
-  
+  // const { totalMontantLivre, totalMontantVendu, difference } = useSelector(selectMontantsTotal);
+  const { totalMontantLivre, totalMontantVendu, difference, loading } = useSelector((state) => ({
+    //@ts-ignore
+    ...selectMontantsTotal(state),
+    //@ts-ignore
+    loading: state.loading,
+  }));
 
   useEffect(()=>{
     dispatch(fetchAllStockVariations())
-   // dispatch(fetchProduits())
+  
   },[dispatch])
- 
+ if(loading){
+  console.log('chargement')
+ }
 
   return (
     <>
