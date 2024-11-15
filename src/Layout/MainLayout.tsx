@@ -9,6 +9,7 @@ import { styled } from '@mui/material/styles';
 import { Outlet, useNavigate } from 'react-router-dom';
 // import { makeStyles} from '@mui/styles'
 import logo from '@/images/ai-generated-8201392_1280.png'
+import agricap from '@/images/agricap.png';
 import avatar1 from '@/images/man-156584_1280.png'
 import './../global.css'
 import AdminOnglet from '@/components/ui/AdminOnglet';
@@ -188,19 +189,25 @@ console.log('taille ecran : ',window.innerWidth)
       <Button onClick={handleClick}>
         {/* {selectedItem || 'Select an option'} */}
         <Avatar alt="User" src={avatar1} sx={{ ml: 2 }} />
-      </Button>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem><AdminPanelSettingsIcon /> {user?.role}</MenuItem>
-        <MenuItem><Inventory /> {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}</MenuItem>
-        <MenuItem onClick={handleConfig}><Settings /> Parametre</MenuItem>
-        <MenuItem onClick={handleProfil}><Person /> Profil</MenuItem>
-        <Divider/>
-        <MenuItem onClick={handleLogout}><LogoutIcon /> se deconnecter</MenuItem>
-      </Menu>
+      </Button>     
+
+<Menu
+    anchorEl={anchorEl}
+    open={Boolean(anchorEl)}
+    onClose={handleClose}
+    sx={{
+      mt: '5px', // pour espacer verticalement
+      ml: '-10px', // pour décaler le menu vers la gauche
+      marginRight: '10px' // espacement à droite
+    }}
+  >
+    <MenuItem><AdminPanelSettingsIcon /> {user?.role}</MenuItem>
+    <MenuItem><Inventory /> {user?.role === 'Vendeur' ? user?.pointVente?.nom : 'Depot Central'}</MenuItem>
+    <MenuItem onClick={handleConfig}><Settings /> Parametre</MenuItem>
+    <MenuItem onClick={handleProfil}><Person /> Profil</MenuItem>
+    <Divider />
+    <MenuItem onClick={handleLogout}><LogoutIcon /> Se déconnecter</MenuItem>
+  </Menu>
     </div>
         </Toolbar>
       </AppBarStyled>
@@ -235,7 +242,7 @@ console.log('taille ecran : ',window.innerWidth)
       </Box>
       <Divider />
       <Box sx={{ textAlign: 'center', p: 1, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        <img src={logo} alt="Logo" style={{ width: '64px', height: '64px', borderRadius: '50%',marginRight:'10px' }} />
+        <img src={logo} alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '50%',marginRight:'10px' }} />
         <Typography variant="h6" className='mr-5 text-white'>FFGGAASS</Typography>
       </Box>
       <Divider />
@@ -244,9 +251,25 @@ console.log('taille ecran : ',window.innerWidth)
         {/* <AdminOnglet/> */}
 
       </div>
-      <div className='flex p-3'>
-          <h6 className='p-5 text-gray-400'>Application realise par Inaf</h6>
-      </div>
+      <div className="flex flex-col items-center justify-center p-5 bg-gray-100">
+  <Avatar
+    src={agricap}
+    alt="Logo"
+    sx={{
+      width: 50,
+      height: 50,
+      objectFit: 'contain',
+      borderRadius: '50%',
+      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+      backgroundColor: '#fff',
+      marginBottom: '10px',  // Pour que le texte soit légèrement en-dessous de l'image
+    }}
+  />
+  <h6 className="text-gray-400 text-center">
+    Application réalisée par Inaf
+  </h6>
+</div>
+
      
     </Drawer>      
       <Main open={!isMobile && open} className='bg-white' sx={{minHeight:'100vh',width:`100%`,  padding:'0'}}>
