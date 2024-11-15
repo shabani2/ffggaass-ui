@@ -5,7 +5,7 @@
 //@ts-ignore
 import { Box, Container, TextField, Typography, Avatar, InputAdornment,CircularProgress, IconButton } from '@mui/material';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Phone, Lock,Visibility, VisibilityOff } from '@mui/icons-material';
+import { Phone,Visibility, VisibilityOff } from '@mui/icons-material';
 import logo from '@/images/inaf.png';
 import { useNavigate } from 'react-router-dom';
 import { fetchUsers, loginUser, selectAllUsers } from '@/Redux/Auth/userSlice';
