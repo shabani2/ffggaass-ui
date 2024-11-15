@@ -33,10 +33,11 @@ const Home = () => {
     dispatch(fetchAllStockVariations())
   
   },[dispatch])
+  console.log(`pv : ${totalMontantVendu}, cr: ${totalMontantLivre}`)
  if(loading){
   console.log('chargement')
  }
-console.log(`pv : ${totalMontantVendu}, cr: ${totalMontantLivre}`)
+
   return (
     <>
       <div className="min-h-screen p-[2rem] bg-gray-400">
@@ -45,14 +46,14 @@ console.log(`pv : ${totalMontantVendu}, cr: ${totalMontantLivre}`)
             <InfoCard 
             title="Chiffre d'affaires" 
             icon={<FaDollarSign className='text-green-600'/>} 
-            amount={totalMontantVendu} 
+            amount={!loading?totalMontantVendu:0} 
           />     
         </div>
         <div className=" bg-white rounded shadow h-[150px]">
           <InfoCard 
             title="Coût de revient" 
             icon={<FaMoneyBillWave className='text-red-600'/>} 
-            amount={totalMontantLivre} 
+            amount={!loading?totalMontantLivre:0} 
           />      
           
         </div>
@@ -60,7 +61,7 @@ console.log(`pv : ${totalMontantVendu}, cr: ${totalMontantLivre}`)
           <InfoCard 
           title="Marge brute" 
           icon={<FaChartLine className='text-blue-600' />} 
-          amount={difference} 
+          amount={!loading?difference:0} 
         />
         </div>
       </div>
