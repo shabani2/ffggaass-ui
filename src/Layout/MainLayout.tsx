@@ -110,7 +110,7 @@ const navigate = useNavigate();
       const decodedToken = jwtDecode<{ userId: string }>(token);
       setUserId(decodedToken.userId);
       dispatch(findUserById(decodedToken.userId));
-      console.log('user connected=>',user)
+    
       
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -145,7 +145,7 @@ const navigate = useNavigate();
   const handleConfig= ()=>{
     navigate('/settings')
   }
-console.log('taille ecran : ',window.innerWidth)
+
 
   
   // Exemple de données pour le dropdown

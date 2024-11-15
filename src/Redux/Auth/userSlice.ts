@@ -152,7 +152,7 @@ export const loadUserFromToken = createAsyncThunk('users/loadUserFromToken', asy
 export const findUserById = createAsyncThunk('users/findById', async (id: string, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get(`/user/${id}`);
-    console.log(response.data)
+    
     return response.data;
   } catch (error) {
     const err = error as AxiosError;

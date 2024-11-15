@@ -36,7 +36,7 @@ const Home = () => {
  if(loading){
   console.log('chargement')
  }
-
+console.log(`pv : ${totalMontantVendu}, cr: ${totalMontantLivre}`)
   return (
     <>
       <div className="min-h-screen p-[2rem] bg-gray-400">
