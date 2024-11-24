@@ -24,11 +24,12 @@ const StockBarChart: React.FC = () => {
 
     // Transformer les données en format compatible avec Nivo
     const groupedData: BarChartData[] = stockVariations.map((variation) => ({
-        produit: variation.produit.nom,
-        quantiteLivre: variation.quantiteLivre,
-        quantiteVendu: variation.quantiteVendu,
-        solde: variation.solde,
-    }));
+      produit: variation.produit?.nom || "Produit Inconnu", // Si `variation.produit` ou `nom` est manquant, utilise une valeur par défaut
+      quantiteLivre: variation.quantiteLivre || 0,         // Défaut à 0 si non défini
+      quantiteVendu: variation.quantiteVendu || 0,         // Défaut à 0 si non défini
+      solde: variation.solde || 0,                         // Défaut à 0 si non défini
+  }));
+  
 
     return (
         <div>

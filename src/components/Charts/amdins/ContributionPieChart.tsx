@@ -22,17 +22,29 @@ const ContributionPieChart = () => {
     // Calcul de la contribution de chaque point de vente au totalMontantVendu
     
     const data = stockVariationsWithMontants.reduce((acc: any[], item) => {
-        const existingPointVente = acc.find(d => d.id === item.pointVente.nom);
-        const montantVendu = item.montantVendu;
-        
+        if (!item) {
+            console.warn("Item invalide détecté :", item);
+            return acc; // Ignore les items invalides
+        }
+    
+        const pointVenteNom = item.pointVente?.nom || "Point de Vente Inconnu"; // Valeur par défaut si `pointVente.nom` est absent
+        const montantVendu = item.montantVendu ?? 0; // Valeur par défaut 0 si `montantVendu` est absent
+    
+        const existingPointVente = acc.find(d => d.id === pointVenteNom);
+    
         if (existingPointVente) {
             existingPointVente.value += montantVendu;
         } else {
-            acc.push({ id: item.pointVente.nom, label: item.pointVente.nom, value: montantVendu });
+            acc.push({
+                id: pointVenteNom,
+                label: pointVenteNom,
+                value: montantVendu,
+            });
         }
-        
+    
         return acc;
     }, []);
+    
 
     return (
         <div className="flex flex-col justify-between h-full">

@@ -7,9 +7,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button, Chip, Typography, Modal, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { AppDispatch, RootState } from '@/Redux/Store';
-import { addLivraison, fetchExcludedLivraisons, selectAllLivraisons } from '@/Redux/Admin/livraisonSlice';
+import { addLivraison, fetchExcludedLivraisons, selectAllLivraisons,exportLivraison, importLivraison } from '@/Redux/Admin/livraisonSlice';
 import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice';
-import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
+//import { exportMvtStock, importMvtStock, fetchMvtStocks } from '@/Redux/Admin/mvtStockSlice';
 import { fetchProduits, Produit1, selectAllProduits } from '@/Redux/Admin/productSlice';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Download as DownloadIcon, Upload as UploadIcon } from '@mui/icons-material';
@@ -152,25 +152,28 @@ const LivraisonPage = () => {
   };
 
   const handleExport = (format: 'csv' | 'xlsx') => {
-    dispatch(exportMvtStock(format)).then((action) => {
+    dispatch(exportLivraison(format)).then((action) => {
       if (action.meta.requestStatus === 'fulfilled') {
         const url = window.URL.createObjectURL(new Blob([action.payload]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `mvtStock.${format}`);
+        link.setAttribute('download', `livraisons.${format}`);
         document.body.appendChild(link);
         link.click();
       }
     });
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      dispatch(importMvtStock(file));
-      dispatch(fetchMvtStocks());
-      dispatch(fetchProduits());
-      dispatch(fetchCategories());
+      dispatch(importLivraison(file));
+      
+      dispatch(await fetchProduits());
+      dispatch(await fetchCategories());
+      dispatch(await fetchExcludedLivraisons(user?.pointVente?.nom)).then((rep)=>{
+        console.log('rep',rep.payload)
+      }); 
     }
   };
 

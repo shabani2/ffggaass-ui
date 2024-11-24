@@ -4,15 +4,7 @@ import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, Enti
 import axiosInstance from '@/Utils/axiosInstance';
 //import { RootState } from '../Store';
 
-// export interface Produit1 {
-//   id: EntityId;
-//   _id: string;
-//   nom: string;
-//   prix: number;
-//   category: string; // Reference to Category ID
-//   createdAt: string;
-//   updatedAt: string;
-// }
+
 export interface Category {
     id : EntityId
     _id: string;
@@ -90,6 +82,39 @@ export const deleteProduit = createAsyncThunk('produits/delete', async (produitI
   }
 });
 
+
+//code pour import export de fichier vers excel ou csv
+
+export const exportProduit = createAsyncThunk('produit/export', async (format: 'csv' | 'xlsx') => {
+  const response = await axiosInstance.get(`/produit/export?format=${format}`, {
+    responseType: 'blob', // Important for file downloads
+  });
+  return response.data;
+});
+
+//code pour l'importation
+export const importProduit = createAsyncThunk('produit/import', async (file: File,{ rejectWithValue }) => {
+  try{
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await axiosInstance.post('/produit/import', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  //return // Assuming the API returns the imported data
+  return response.data.map((ms: { _id: unknown }) => ({
+    id: ms._id,
+    ...ms,
+  }));
+} catch (error) {
+  //@ts-ignore
+  return rejectWithValue(error.response.data);
+}
+});
+
 const produitSlice = createSlice({
   name: 'produits',
   initialState,
@@ -147,6 +172,29 @@ const produitSlice = createSlice({
       .addCase(deleteProduit.rejected, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(exportProduit.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(exportProduit.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(exportProduit.rejected, (state, action) => {
+        state.loading = false;
+        //@ts-ignore
+        state.error = action.error.message;
+      })
+      .addCase(importProduit.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(importProduit.fulfilled, (state, action) => {
+        state.loading = false;
+        produitAdapter.setAll(state, action.payload);
+      })
+      .addCase(importProduit.rejected, (state, action) => {
+        state.loading = false;
+        //@ts-ignore
+        state.error = action.error.message;
       });
   },
 });

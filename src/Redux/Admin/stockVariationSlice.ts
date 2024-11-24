@@ -122,16 +122,25 @@ export const {
   selectById: selectStockVariationById,
 } = stockVariationAdapter.getSelectors((state: RootState) => state.stockVariation);
 
+
 export const selectStockVariationWithMontants = createSelector(
   [selectAllStockVariations],
   (stockVariations) => {
-    return stockVariations.map((item) => ({
-      ...item,
-      montantLivre: item.quantiteVendu * item.produit.prix,
-      montantVendu: item.quantiteVendu * item.produit.prixVente,
-    }));
+    return stockVariations.map((item) => {
+      // Vérification si le produit est valide
+      const produit = item.produit || {};
+      const prix = produit.prix || 0; // Par défaut, 0 si `prix` est manquant
+      const prixVente = produit.prixVente || 0; // Par défaut, 0 si `prixVente` est manquant
+      
+      return {
+        ...item,
+        montantLivre: item.quantiteVendu * prix,
+        montantVendu: item.quantiteVendu * prixVente,
+      };
+    });
   }
 );
+
 
 export const selectMontantsTotal = createSelector(
   [selectStockVariationWithMontants],

@@ -4,13 +4,13 @@ import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { Button, IconButton, Modal, Box, Stack } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { AppDispatch, RootState } from '@/Redux/Store';
-import { fetchProduits, addProduit, updateProduit, deleteProduit, selectAllProduits } from '@/Redux/Admin/productSlice';
+import { fetchProduits, addProduit, updateProduit, deleteProduit, selectAllProduits, exportProduit, importProduit } from '@/Redux/Admin/productSlice';
 import { fetchCategories, selectAllCategories } from '@/Redux/Admin/categorySlice'; // Assuming categorySlice is already set up
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { EntityId } from '@reduxjs/toolkit';
 import { DownloadIcon, PlusIcon, UploadIcon } from 'lucide-react';
-import { exportMvtStock, fetchMvtStocks, importMvtStock } from '@/Redux/Admin/mvtStockSlice';
+//import { exportMvtStock, fetchMvtStocks, importMvtStock } from '@/Redux/Admin/mvtStockSlice';
 
 interface Category {
   
@@ -125,12 +125,12 @@ const Produit: React.FC = () => {
   };
 
   const handleExport = (format: 'csv' | 'xlsx') => {
-    dispatch(exportMvtStock(format)).then((action) => {
+    dispatch(exportProduit(format)).then((action) => {
       if (action.meta.requestStatus === 'fulfilled') {
         const url = window.URL.createObjectURL(new Blob([action.payload]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `mvtStock.${format}`);
+        link.setAttribute('download', `produits.${format}`);
         document.body.appendChild(link);
         link.click();
       }
@@ -140,8 +140,8 @@ const Produit: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      dispatch(importMvtStock(file));
-      dispatch(fetchMvtStocks());
+      dispatch(importProduit(file));
+      //dispatch(fetchMvtStocks());
       dispatch(fetchProduits());
       dispatch(fetchCategories());
     }

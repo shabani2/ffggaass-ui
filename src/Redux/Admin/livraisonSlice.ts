@@ -126,35 +126,9 @@ export const fetchExcludedLivraisons = createAsyncThunk(
   }
 );
 
-// Exportation des données
-export const exportLivraison = createAsyncThunk('livraison/export', async (format: 'csv' | 'xlsx') => {
-  const response = await axiosInstance.get(`/file/livraison/export?format=${format}`, {
-    responseType: 'blob', // Important pour les téléchargements de fichiers
-  });
-  return response.data;
-});
 
-// Importation des données
-export const importLivraison = createAsyncThunk('livraison/import', async (file: File, { rejectWithValue }) => {
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
 
-    const response = await axiosInstance.post('/file/livraison/import', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
 
-    return response.data.map((l: { _id: unknown }) => ({
-      id: l._id,
-      ...l,
-    }));
-  } catch (error) {
-    //@ts-ignore
-    return rejectWithValue(error.response.data);
-  }
-});
 
 export const updateLivraisonStatut = createAsyncThunk(
   'livraison/updateStatut',
@@ -174,6 +148,39 @@ export const updateLivraisonStatut = createAsyncThunk(
     }
   }
 );
+
+
+//code pour import export de fichier vers excel ou csv
+
+export const exportLivraison = createAsyncThunk('/livraison/export', async (format: 'csv' | 'xlsx') => {
+  const response = await axiosInstance.get(`/livraison/export?format=${format}`, {
+    responseType: 'blob', // Important for file downloads
+  });
+  return response.data;
+});
+
+//code pour l'importation
+export const importLivraison = createAsyncThunk('/livraison/import', async (file: File,{ rejectWithValue }) => {
+  try{
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await axiosInstance.post('/livraison/import', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  //return // Assuming the API returns the imported data
+  return response.data.map((ms: { _id: unknown }) => ({
+    id: ms._id,
+    ...ms,
+  }));
+} catch (error) {
+  //@ts-ignore
+  return rejectWithValue(error.response.data);
+}
+});
 
 const initialState = livraisonAdapter.getInitialState({
   loading: false,
@@ -295,29 +302,7 @@ const livraisonSlice = createSlice({
           //@ts-ignore
         state.error = action.payload;
       })
-      .addCase(exportLivraison.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(exportLivraison.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(exportLivraison.rejected, (state, action) => {
-        state.loading = false;
-          //@ts-ignore
-        state.error = action.error.message;
-      })
-      .addCase(importLivraison.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(importLivraison.fulfilled, (state, action) => {
-        state.loading = false;
-        livraisonAdapter.setAll(state, action.payload);
-      })
-      .addCase(importLivraison.rejected, (state, action) => {
-        state.loading = false;
-          //@ts-ignore
-        state.error = action.error.message;
-      })
+     
       .addCase(updateLivraisonStatut.pending, (state) => {
         state.status = 'loading';
       })
@@ -336,6 +321,29 @@ const livraisonSlice = createSlice({
         state.status = 'failed';
         //@ts-ignore
         state.error = action.payload;
+      })
+      .addCase(exportLivraison.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(exportLivraison.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(exportLivraison.rejected, (state, action) => {
+        state.loading = false;
+        //@ts-ignore
+        state.error = action.error.message;
+      })
+      .addCase(importLivraison.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(importLivraison.fulfilled, (state, action) => {
+        state.loading = false;
+        livraisonAdapter.setAll(state, action.payload);
+      })
+      .addCase(importLivraison.rejected, (state, action) => {
+        state.loading = false;
+        //@ts-ignore
+        state.error = action.error.message;
       });
   },
 });
