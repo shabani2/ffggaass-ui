@@ -118,11 +118,19 @@ const Produit: React.FC = () => {
   const error = useSelector((state: RootState) => state.livraison.error);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleUploadClick = () => {
+  // const handleUploadClick = (inputRef: React.RefObject<HTMLInputElement>) => {
+  //   inputRef.current?.click();
+  // };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleUploadClick = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    // L'accès à inputRef est interne, pas besoin de le passer dans l'événement
     if (inputRef.current) {
-      inputRef.current.click();
+      inputRef.current.click();  // Clique sur l'élément input via ref
     }
   };
+
+  
 
   const handleExport = (format: 'csv' | 'xlsx') => {
     dispatch(exportProduit(format)).then((action) => {

@@ -19,9 +19,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const Home = () => {
   const dispatch: AppDispatch = useDispatch();
-// const stockVariation = useSelector((state:RootState)=>selectAllStockVariations(state))
- // const stockVariationsWithMontants = useSelector(selectStockVariationWithMontants);
-  // const { totalMontantLivre, totalMontantVendu, difference } = useSelector(selectMontantsTotal);
   const { totalMontantLivre, totalMontantVendu, difference, loading } = useSelector((state) => ({
     //@ts-ignore
     ...selectMontantsTotal(state),
@@ -33,7 +30,7 @@ const Home = () => {
     dispatch(fetchAllStockVariations())
   
   },[dispatch])
-  console.log(`pv : ${totalMontantVendu}, cr: ${totalMontantLivre}`)
+ // console.log(`pv : ${totalMontantVendu}, cr: ${totalMontantLivre}`)
  if(loading){
   console.log('chargement')
  }
@@ -67,20 +64,15 @@ const Home = () => {
       </div>
 
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="p-4 bg-gray-50 rounded shadow h-[500px] ">
-        {/* <VenteBarChart/> */}
-        <h2 className='text-xl text-center text-blue-600'>Situation de stock pour chaque produit</h2>
-        <StockBarChart/>
-        </div>
-        <div className="p-4 bg-white rounded shadow h-[500px] col-span-2">
-          
-        <LivraisonBarChart/>
-        </div>
-
-      </div>
-
-
+  <div className="grid grid-cols-1 gap-4 mb-4">
+  {/* Colonne de gauche */}
+  <div className="p-4 bg-gray-50 rounded shadow h-[500px] w-full">
+    <h2 className="text-xl text-center text-blue-600">
+      evaluation de chaque produit
+    </h2>
+    <StockBarChart />
+  </div>
+</div>
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="p-4 bg-white rounded shadow h-[500px]  col-span-2">
         <h2 className='text-xl text-center text-blue-600'>Repartition de vente de produits par boutique</h2>
@@ -90,9 +82,16 @@ const Home = () => {
         <ContributionPieChart/>
         </div>
 
-      </div>
+      </div>  
 
+      <div className='grid grid-cols-1 gap-4 mb-4'>
+    <div className="p-4 bg-white rounded shadow h-[500px]">      
+      <LivraisonBarChart />
+    </div>
+  </div>   
   </div>
+
+  
   </>
     
   )

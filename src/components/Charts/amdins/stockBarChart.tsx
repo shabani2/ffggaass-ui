@@ -12,7 +12,7 @@ interface BarChartData {
     [key: string]: number | string; // clé dynamique pour 'quantiteLivre', 'quantiteVendu', et 'solde'
 }
 
-const colorPalette = ['#2a9d8f', '#264653', '#e9c46a']; // Exemple de palette de couleurs
+//const colorPalette = ['#2a9d8f', '#264653', '#e9c46a']; // Exemple de palette de couleurs
 
 const StockBarChart: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
@@ -21,7 +21,7 @@ const StockBarChart: React.FC = () => {
     useEffect(() => {
         dispatch(fetchAllStockVariations());
     }, [dispatch]);
-
+  
     // Transformer les données en format compatible avec Nivo
     const groupedData: BarChartData[] = stockVariations.map((variation) => ({
       produit: variation.produit?.nom || "Produit Inconnu", // Si `variation.produit` ou `nom` est manquant, utilise une valeur par défaut
@@ -29,7 +29,9 @@ const StockBarChart: React.FC = () => {
       quantiteVendu: variation.quantiteVendu || 0,         // Défaut à 0 si non défini
       solde: variation.solde || 0,                         // Défaut à 0 si non défini
   }));
-  
+ // console.log('stockvariation=> ',groupedData);
+ console.log('Index Values:', groupedData.map(data => data.produit));
+
 
     return (
         <div>
@@ -37,76 +39,44 @@ const StockBarChart: React.FC = () => {
             stockVariations.length <= 0 ? (
               <p>Pas de données disponibles</p>
             ) : (
-              <div className="h-full">
-                <div className="flex-grow h-[90%]">
+              
+                <div style={{width:"100%",height:"430px", backgroundColor: '#808b96'}}>                
+                  {/* <div style={{ height: '500px', width: '800px', backgroundColor: '#f0f0f0' }}> */}
                   <ResponsiveBar
-                    data={groupedData}
-                    keys={['quantiteLivre', 'quantiteVendu', 'solde']}
-                    indexBy="produit"
-                    layout="horizontal"
-                    margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-                    padding={0.3}
-                    valueScale={{ type: 'linear' }}
-                    indexScale={{ type: 'band', round: true }}
-                    colors={colorPalette} // Utiliser la palette de couleurs définie
-                    borderColor={{
-                      from: 'color',
-                      modifiers: [['darker', 1.6]],
-                    }}
-                    axisTop={null}
-                    axisRight={null}
-                    axisBottom={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      legend: 'Quantités',
-                      legendPosition: 'middle',
-                      legendOffset: 32,
-                    }}
-                    axisLeft={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      legend: 'Produits',
-                      legendPosition: 'middle',
-                      legendOffset: -40,
-                    }}
-                    labelSkipWidth={12}
-                    labelSkipHeight={12}
-                    labelTextColor={{
-                      from: 'color',
-                      modifiers: [['darker', 1.6]],
-                    }}
-                    legends={[
-                      {
-                        dataFrom: 'keys',
-                        anchor: 'bottom-right',
-                        direction: 'column',
-                        justify: false,
-                        translateX: 120,
-                        translateY: 0,
-                        itemsSpacing: 2,
-                        itemWidth: 100,
-                        itemHeight: 20,
-                        itemDirection: 'left-to-right',
-                        itemOpacity: 0.85,
-                        symbolSize: 20,
-                        effects: [
-                          {
-                            on: 'hover',
-                            style: {
-                              itemOpacity: 1,
-                            },
-                          },
-                        ],
-                      },
-                    ]}
-                    role="application"
-                    ariaLabel="Nivo bar chart demo"
-                    barAriaLabel={(e) => `${e.id}: ${e.formattedValue} dans ${e.indexValue}`}
-                  />
+  data={groupedData}
+  keys={['quantiteLivre', 'quantiteVendu', 'solde']}
+  indexBy="produit"
+  margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+  padding={0.3}
+  colors={['#2a9d8f', '#264653', '#e9c46a']}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: 'Quantités',
+    legendPosition: 'middle',
+    legendOffset: 32,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    tickTextColor: 'white',  // Couleur blanche pour le texte de l'axe X
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: 'Produits',
+    legendPosition: 'middle',
+    legendOffset: -40,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    tickTextColor: 'white',  // Couleur blanche pour le texte de l'axe Y
+  }}
+  labelTextColor="white"  // Couleur blanche pour les labels des barres
+/>
+
+{/* </div> */}
                 </div>
-              </div>
+              
             )
           }
        </div>   

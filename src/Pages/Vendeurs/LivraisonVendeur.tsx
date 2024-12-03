@@ -113,36 +113,10 @@ const LivraisonVendeur = () => {
       width: 200,
       renderCell: (params) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss'),
     },
-    // {
-    //   field: 'actions',
-    //   headerName: 'Actions',
-    //   width: 100,
-    //   renderCell: (params) => (
-    //     <>
-    //       <IconButton
-    //         color="primary"
-    //         // onClick={() => handleEditClick(params.row as MvtStock)}
-    //       >
-    //         <EditIcon />
-    //       </IconButton>
-    //       <IconButton
-    //         color="secondary"
-    //         onClick={() => handleDelete(params.row.id)}
-    //       >
-    //         <DeleteIcon />
-    //       </IconButton>
-    //     </>
-    //   ),
-    // },
-  ];
-  
- 
- 
-
+  ]
+    
   const handleUploadClick = () => {
-    if (inputRef.current) {
-      inputRef.current.click();
-    }
+    inputRef.current?.click();
   };
 
   const handleExport = (format: 'csv' | 'xlsx') => {
@@ -209,13 +183,13 @@ const LivraisonVendeur = () => {
         <Box >
         <div className='flex flex-row justify-between w-full pt-5 pb-2'>
           <div className='w-2/5'>
-            <h1 className='text-3xl text-blue-500'>Tableau de bon d'entree en stock</h1>
+            <h1 className='text-3xl text-blue-500'>fiche de Livraison</h1>
           </div>
-          <div className='flex justify-end w-1/5'>
+          {/* <div className='flex justify-end w-1/5'>
             <Button variant="contained" color="primary">
               Nouveau livraison
             </Button>
-          </div>
+          </div> */}
         </div>
               
           {livraisons.length>0 ?

@@ -42,18 +42,18 @@ const coreRoutes = [
   },
   {
     path: '/caisse',
-    title: 'Decaissement',
+    title: 'Livraison',
     component: Caisse,
   },
   {
     path: '/livraison',
-    title: 'Fiche de Livraisons',
+    title: 'Journal de Livraisons',
     component: Livraison,
   },
  
   {
     path: '/bonEntre',
-    title: 'Bon d\'entre',
+    title: 'Journal Des Intrants',
     component: bonEntre,
   },
   {
@@ -74,7 +74,7 @@ const coreRoutes = [
  
   {
     path: '/stock',
-    title: 'Stock',
+    title: 'Solde en Stock',
     component: Stock,
   },
 

@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Stack, Typography, Chip } from '@mui/material';
@@ -10,12 +9,11 @@ import { fetchCommandes, addCommande, selectAllCommandes } from '@/Redux/Admin/c
 import { fetchProduits } from '@/Redux/Admin/productSlice';
 import { fetchClients } from '@/Redux/Admin/clientSlice';
 import { format } from 'date-fns';
-import { Commande, Client } from '@/Utils/dataTypes';
+import { Commande, Client, Produit } from '@/Utils/dataTypes';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Produit } from '@/Utils/dataTypes';
 
 // Validation schema for the form
 const validationSchema = yup.object({
@@ -29,14 +27,14 @@ const CommandePage = () => {
   const dispatch: AppDispatch = useDispatch();
   const commandes = useSelector(selectAllCommandes);
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
-
-  //@ts-ignore
+//@ts-ignore
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   //@ts-ignore
   const [selectedCommande, setSelectedCommande] = useState<Commande | null>(null);
   //@ts-ignore
   const [filteredProduits, setFilteredProduits] = useState<Produit[]>([]);
-  const [selectedProduit] = useState<Produit| null>(null);
+  //@ts-ignore
+  const [selectedProduit, setSelectedProduit] = useState<Produit | null>(null);
   //@ts-ignore
   const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
 
@@ -56,7 +54,7 @@ const CommandePage = () => {
         produit: selectedProduit,
         client: values.client,
       };
-      //@ts-ignore
+       //@ts-ignore
       dispatch(addCommande(commandeData));
       dispatch(fetchCommandes());
       resetForm();
@@ -81,8 +79,7 @@ const CommandePage = () => {
       },
     },
     { field: 'client', headerName: 'Client', width: 150, valueGetter: (params: Client) => params.nom },
-    //@ts-ignore
-    { field: 'produit', headerName: 'Produit', width: 150, valueGetter: (params: Produit1) => params.nom },
+    { field: 'produit', headerName: 'Produit', width: 150, valueGetter: (params: Produit) => params.nom },
     { field: 'quantite', headerName: 'Quantité', width: 100 },
     { field: 'montant', headerName: 'Montant', width: 150 },
     {
@@ -105,21 +102,17 @@ const CommandePage = () => {
   const handleOpenModal = (mode: 'create' | 'edit', commande?: Commande) => {
     setModalMode(mode);
     setSelectedCommande(commande || null);
-    
   };
 
   const handleCloseModal = () => {
-    
     setSelectedCommande(null);
   };
 
-
-
+  // Calculer le montant à chaque changement de quantite ou prix
   useEffect(() => {
     const montant = formik.values.quantite * formik.values.prix;
     formik.setFieldValue('montant', montant);
-    //@ts-ignore
-  }, [formik.values.quantite, formik.values.prix, formik]);
+  }, [formik.values.quantite, formik.values.prix]); // Mettre à jour uniquement lorsque quantite ou prix changent
 
   return (
     <div className='h-screen w-full bg-gray-200 p-8'>
@@ -149,8 +142,6 @@ const CommandePage = () => {
         )}
       </Box>
 
-      {/* Modal for creating/editing a Commande */}
-     
       <ToastContainer />
     </div>
   );

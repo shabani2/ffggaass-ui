@@ -100,75 +100,78 @@ const LivraisonBarChart: React.FC = () => {
     return (
         <div className="h-full">
             <h2 className="mb-4 text-xl font-bold text-center text-blue-600">
-                Répartition des Quantités des Produits par Point de Vente et par Mois
+                Répartition des Produits par Point de Vente 
             </h2>
-            <div className='h-[90%]'>
-                <ResponsiveBar
-                    //@ts-ignore
-                    data={completeData}
-                    keys={allProduits} // Utiliser tous les produits
-                    indexBy="pointVente"
-                    margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-                    padding={0.3}
-                    valueScale={{ type: 'linear' }}
-                    indexScale={{ type: 'band', round: true }}
-                    colors={colorPalette} // Utiliser la palette de couleurs définie
-                    borderColor={{
-                        from: 'color',
-                        modifiers: [['darker', 1.6]]
-                    }}
-                    axisTop={null}
-                    axisRight={null}
-                    axisBottom={{
-                        tickSize: 5,
-                        tickPadding: 5,
-                        tickRotation: 0,
-                        legend: 'Point de Vente et Mois',
-                        legendPosition: 'middle',
-                        legendOffset: 32
-                    }}
-                    axisLeft={{
-                        tickSize: 5,
-                        tickPadding: 5,
-                        tickRotation: 0,
-                        legend: 'Quantité',
-                        legendPosition: 'middle',
-                        legendOffset: -40
-                    }}
-                    labelSkipWidth={12}
-                    labelSkipHeight={12}
-                    labelTextColor={{
-                        from: 'color',
-                        modifiers: [['darker', 1.6]]
-                    }}
-                    legends={[
-                        {
-                            dataFrom: 'keys',
-                            anchor: 'bottom-right',
-                            direction: 'column',
-                            justify: false,
-                            translateX: 120,
-                            translateY: 0,
-                            itemsSpacing: 2,
-                            itemWidth: 100,
-                            itemHeight: 20,
-                            itemDirection: 'left-to-right',
-                            itemOpacity: 0.85,
-                            symbolSize: 20,
-                            effects: [
-                                {
-                                    on: 'hover',
-                                    style: {
-                                        itemOpacity: 1
-                                    }
-                                }
-                            ]
-                        }
-                    ]}
-                    role="application"
-                    ariaLabel="Graphique à barres pour la répartition des produits"
-                    barAriaLabel={e => `${e.id}: ${e.formattedValue} dans ${e.indexValue}`}
-                />
+            <div className='h-[90%] bg-[#808b96]'>
+            <ResponsiveBar
+    //@ts-ignore
+    data={completeData}
+    keys={allProduits} // Utiliser tous les produits
+    indexBy="pointVente"
+    margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+    padding={0.3}
+    valueScale={{ type: 'linear' }}
+    indexScale={{ type: 'band', round: true }}
+    colors={colorPalette} // Utiliser la palette de couleurs définie
+    borderColor={{
+        from: 'color',
+        modifiers: [['darker', 1.6]]
+    }}
+    axisTop={null}
+    axisRight={null}
+    axisBottom={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: 'Quantités',
+        legendPosition: 'middle',
+        legendOffset: 32,
+        //@ts-ignore
+        tickTextColor: 'white',  // Couleur blanche pour le texte de l'axe X
+    }}
+    axisLeft={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: 'Produits',
+        legendPosition: 'middle',
+        legendOffset: -40,
+         //@ts-ignore
+        tickTextColor: 'white',  // Couleur blanche pour le texte de l'axe Y
+    }}
+    labelSkipWidth={12}
+    labelSkipHeight={12}
+    labelTextColor="white"  // Couleur blanche pour le texte des labels des barres
+    legends={[
+        {
+            dataFrom: 'keys',
+            anchor: 'bottom-right',
+            direction: 'column',
+            justify: false,
+            translateX: 120,
+            translateY: 0,
+            itemsSpacing: 2,
+            itemWidth: 100,
+            itemHeight: 20,
+            itemDirection: 'left-to-right',
+            itemOpacity: 0.85,
+            symbolSize: 20,
+            effects: [
+                {
+                    on: 'hover',
+                    style: {
+                        itemOpacity: 1
+                    }
+                }
+            ],
+            itemTextColor: 'white', // Couleur blanche pour le texte de la légende
+        }
+    ]}
+    role="application"
+    ariaLabel="Graphique à barres pour la répartition des produits"
+    barAriaLabel={e => `${e.id}: ${e.formattedValue} dans ${e.indexValue}`}
+/>
+
             </div>
         </div>
     );

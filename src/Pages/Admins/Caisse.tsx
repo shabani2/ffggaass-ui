@@ -190,7 +190,7 @@ const Caisse: React.FC = () => {
     <div className="flex flex-col items-center w-full min-h-screen p-6 ">
       {/* Header */}
       <header className="w-full p-6 mb-6 bg-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800">Operation de Bon d'Entre</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Operation de Livraison</h1>
       </header>
 
       {/* Main Content */}
@@ -478,7 +478,7 @@ const Caisse: React.FC = () => {
            type="submit"  // Assurez-vous que le bouton est de type "submit"
             className="w-full px-4 py-2 text-white bg-green-600 rounded-lg shadow-md hover:bg-green-500"
           >
-           {loading ? <CircularProgress size={24} /> : 'Validate Facture'}
+           {loading ? <CircularProgress size={24} /> : 'Valider bon de Livraison'}
           </button>
         </form>
         

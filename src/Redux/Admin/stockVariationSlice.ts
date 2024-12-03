@@ -144,10 +144,15 @@ export const selectStockVariationWithMontants = createSelector(
 
 export const selectMontantsTotal = createSelector(
   [selectStockVariationWithMontants],
+  
   (stockVariationsWithMontants) => {
     const totalMontantLivre = stockVariationsWithMontants.reduce((total, item) => total + item.montantLivre, 0);
     const totalMontantVendu = stockVariationsWithMontants.reduce((total, item) => total + item.montantVendu, 0);
     const difference = totalMontantVendu - totalMontantLivre;
+    // console.log(stockVariationsWithMontants);
+    // console.log(stockVariationsWithMontants.map(item => item.montantLivre));
+    // console.log(stockVariationsWithMontants.map(item => item.montantVendu));
+    
 
     return {
       totalMontantLivre,

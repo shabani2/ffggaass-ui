@@ -247,7 +247,7 @@ const BonEntrePage = () => {
         <Box >
         <div className='flex flex-row justify-between w-full pt-5 pb-2'>
           <div className='w-2/5'>
-            <h6 className='text-xl text-blue-500'>Tableau de bon d'entree en stock</h6>
+            <h6 className='text-xl text-blue-500'>Journal d'entre en Depot</h6>
           </div>
           <div className='flex justify-end w-1/5'>
             <button 

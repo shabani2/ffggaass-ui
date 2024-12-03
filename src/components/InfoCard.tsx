@@ -6,7 +6,7 @@ interface InfoCardProps {
   amount: number;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ title, icon, amount }) => {
+const InfoCard: React.FC<InfoCardProps> = ({ title, icon, amount }: { title: string; icon: React.ReactNode; amount: number }) => {
   return (
     <div className="w-full h-full p-4 bg-gray-700 rounded shadow">
       <div className="flex items-center justify-between">

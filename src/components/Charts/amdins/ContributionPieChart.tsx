@@ -51,7 +51,7 @@ const ContributionPieChart = () => {
             <div>
                 <h2 className="mb-4 text-xl font-bold text-center text-blue-600">Contribution de chaque Points de Vente</h2>
             </div>
-            <div className="flex-grow h-[80%]">
+            <div className="flex-grow h-[80%] bg-[#808b96]">
                 <ResponsivePie
                     data={data}
                     margin={{ top: 40, right: 80, bottom: 80, left: 80 }}

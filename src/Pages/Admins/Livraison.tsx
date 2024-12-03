@@ -39,7 +39,7 @@ const LivraisonPage = () => {
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
   const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [modalMode] = useState<'create' | 'edit'>('create');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   //@ts-ignore
   const [selectedDelivery, setSelectedDelivery] = useState<Livraison | null>(null);
@@ -177,11 +177,11 @@ const LivraisonPage = () => {
     }
   };
 
-  const handleOpenModal = (mode: 'create' | 'edit', delivery?: Livraison) => {
-    setModalMode(mode);
-    setSelectedDelivery(delivery || null);
-    setIsModalOpen(true);
-  };
+  // const handleOpenModal = (mode: 'create' | 'edit', delivery?: Livraison) => {
+  //   setModalMode(mode);
+  //   setSelectedDelivery(delivery || null);
+  //   setIsModalOpen(true);
+  // };
 
   const handleCloseModal = () => {
     
@@ -261,13 +261,13 @@ const LivraisonPage = () => {
 
       <Box>
         <div className='mb-4 flex items-center justify-between'>
-          <h6 className='text-xl text-blue-500'>Tableau de bon de livraisons</h6>
-          <button
+          <h6 className='text-xl text-blue-500'>journal de livraisons</h6>
+          {/* <button
             onClick={() => handleOpenModal('create')}
             className="rounded-lg bg-blue-600 px-6 py-2 text-white shadow-md transition duration-300 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
           >
             Nouveau livraison
-          </button>
+          </button> */}
 
         </div>
 
